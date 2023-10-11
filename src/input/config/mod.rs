@@ -3,6 +3,7 @@ mod error;
 use std::{env, str::FromStr};
 
 pub use error::{Error, Result};
+use tracing::info;
 
 // region: -- Config
 #[derive(Debug)]
@@ -13,6 +14,7 @@ pub struct Config {
 
 impl Config {
   pub fn load() -> Result<Self> {
+    info!("config is loading");
     Ok(Self {
       server: ServerConfig::load_from_env()?,
       repository: RepositoryConfig::load_from_env()?,
