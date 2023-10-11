@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-tables
+      author: v.solomasov
+  - include:
+      file: ddl/001_create_tables.sql
+      relativeToChangelogFile: true
