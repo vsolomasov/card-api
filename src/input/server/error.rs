@@ -1,12 +1,12 @@
-use crate::input::server::system::Error as SystemError;
 use crate::input::server::api::Error as ApiError;
+use crate::input::server::system::Error as SystemError;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
   System(SystemError),
-  Api(ApiError)
+  Api(ApiError),
 }
 
 impl From<SystemError> for Error {
