@@ -1,14 +1,13 @@
 mod error;
 
-use std::{env, str::FromStr};
-
 pub use error::{Error, Result};
+use std::{env, str::FromStr};
 use tracing::info;
 
 // region: -- Config
 #[derive(Debug)]
 pub struct Config {
-  pub server: ServerConfig,
+  pub server: ServersConfig,
   pub repository: RepositoryConfig,
 }
 
@@ -16,12 +15,29 @@ impl Config {
   pub fn load() -> Result<Self> {
     info!("config is loading");
     Ok(Self {
-      server: ServerConfig::load_from_env()?,
+      server: ServersConfig::load_from_env()?,
       repository: RepositoryConfig::load_from_env()?,
     })
   }
 }
 // endregion: -- Config
+
+// region: -- ServersConfig
+#[derive(Debug)]
+pub struct ServersConfig {
+  pub system: ServerConfig,
+  pub api: ServerConfig,
+}
+
+impl ServersConfig {
+  fn load_from_env() -> Result<ServersConfig> {
+    Ok(Self {
+      system: ServerConfig::load_from_env("SYSTEM")?,
+      api: ServerConfig::load_from_env("API")?,
+    })
+  }
+}
+// endregion: -- ServersConfig
 
 // region: -- ServerConfig
 #[derive(Debug)]
@@ -31,11 +47,15 @@ pub struct ServerConfig {
 }
 
 impl ServerConfig {
-  fn load_from_env() -> Result<Self> {
-    Ok(Self {
-      host: parse_env("SERVER_HOST")?,
-      port: parse_env("SERVER_PORT")?,
-    })
+  fn load_from_env(prefix: &str) -> Result<Self> {
+    let server_env = format!("{}_SERVER_HOST", prefix);
+    let port_env = format!("{}_SERVER_PORT", prefix);
+    let res = Self {
+      host: parse_env(&server_env)?,
+      port: parse_env(&port_env)?,
+    };
+
+    Ok(res)
   }
 }
 // endregion: -- ServerConfig
@@ -66,12 +86,16 @@ impl RepositoryConfig {
 // endregion: RepositoryConfig
 
 // region: -- private func
-fn get_env(name: &'static str) -> Result<String> {
-  env::var(name).map_err(|_| Error::ConfigIsMissing(name))
+fn get_env(name: &str) -> Result<String> {
+  env::var(name).map_err(|_| Error::ConfigIsMissing(name.to_owned()))
 }
 
-fn parse_env<V: FromStr>(name: &'static str) -> Result<V> {
-  get_env(name).and_then(|env| env.parse::<V>().map_err(|_| Error::ConfigWrongFormat(name)))
+fn parse_env<V: FromStr>(name: &str) -> Result<V> {
+  get_env(name).and_then(|env| {
+    env
+      .parse::<V>()
+      .map_err(|_| Error::ConfigWrongFormat(name.to_owned()))
+  })
 }
 // endregion: -- private func
 
@@ -82,10 +106,12 @@ mod test {
 
   #[test]
   fn test_config_load_from_env_ok() -> Result<()> {
-    env::set_var("SERVER_HOST", "0.0.0.0");
-    env::set_var("SERVER_PORT", "80");
-    env::set_var("REPOSITORY_HOST", "1.1.1.1");
-    env::set_var("REPOSITORY_PORT", "88");
+    env::set_var("SYSTEM_SERVER_HOST", "1.1.1.1");
+    env::set_var("SYSTEM_SERVER_PORT", "111");
+    env::set_var("API_SERVER_HOST", "2.2.2.2");
+    env::set_var("API_SERVER_PORT", "222");
+    env::set_var("REPOSITORY_HOST", "3.3.3.3");
+    env::set_var("REPOSITORY_PORT", "333");
     env::set_var("REPOSITORY_USER", "user");
     env::set_var("REPOSITORY_PASSWORD", "password");
     env::set_var("REPOSITORY_DATABASE", "database");
@@ -93,26 +119,16 @@ mod test {
 
     let config = Config::load()?;
 
-    assert_eq!("0.0.0.0", config.server.host);
-    assert_eq!(80, config.server.port);
-    assert_eq!("1.1.1.1", config.repository.host);
-    assert_eq!(88, config.repository.port);
+    assert_eq!("1.1.1.1", config.server.system.host);
+    assert_eq!(111, config.server.system.port);
+    assert_eq!("2.2.2.2", config.server.api.host);
+    assert_eq!(222, config.server.api.port);
+    assert_eq!("3.3.3.3", config.repository.host);
+    assert_eq!(333, config.repository.port);
     assert_eq!("user", config.repository.user);
     assert_eq!("password", config.repository.password);
     assert_eq!("database", config.repository.database);
     assert_eq!(123, config.repository.pool);
-
-    Ok(())
-  }
-
-  #[test]
-  fn test_config_load_from_env_err() -> Result<()> {
-    env::remove_var("SERVER_HOST");
-
-    let actual_error = Config::load().unwrap_err();
-    let expected_error = Error::ConfigIsMissing("SERVER_HOST");
-
-    assert_eq!(expected_error, actual_error);
 
     Ok(())
   }

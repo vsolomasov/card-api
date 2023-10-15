@@ -1,10 +1,19 @@
+use axum::{
+  http::StatusCode,
+  response::{IntoResponse, Response},
+};
+
 pub type Result<T> = core::result::Result<T, Error>;
 
 #[derive(Debug)]
-#[cfg_attr(test, derive(PartialEq))]
 pub enum Error {
-  ConfigIsMissing(String),
-  ConfigWrongFormat(String),
+  Hyper(hyper::Error),
+}
+
+impl IntoResponse for Error {
+  fn into_response(self) -> Response {
+    StatusCode::INTERNAL_SERVER_ERROR.into_response()
+  }
 }
 
 impl core::fmt::Display for Error {
