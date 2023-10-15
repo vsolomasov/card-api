@@ -1,14 +1,17 @@
+use axum::response::{IntoResponse, Response};
+use hyper::StatusCode;
+
 pub type Result<T> = core::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
-  IdentityLoginIsEmpty,
-  IdentityEmailIsEmpty,
-  IdentityByEmailNotFound(String),
-  IdentityByLoginNotFound(String),
-  IdentityByEmailAlreadyExists(String),
-  IdentityByLoginAlreadyExists(String),
-  Repository(String),
+  Hyper(hyper::Error),
+}
+
+impl IntoResponse for Error {
+  fn into_response(self) -> Response {
+    StatusCode::INTERNAL_SERVER_ERROR.into_response()
+  }
 }
 
 impl core::fmt::Display for Error {

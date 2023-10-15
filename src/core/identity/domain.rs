@@ -38,9 +38,30 @@ impl IdentityLogin {
 }
 // endregion: -- IdentityLogin
 
-// region: -- Identity
+// region: -- IdentityEmail
+pub struct IdentityEmail(String);
+
+impl IdentityEmail {
+  pub fn raw(&self) -> &String {
+    &self.0
+  }
+}
+
+impl TryFrom<String> for IdentityEmail {
+  type Error = super::Error;
+
+  fn try_from(value: String) -> super::Result<Self> {
+    if value.is_empty() {
+      Err(super::Error::IdentityEmailIsEmpty)
+    } else {
+      Ok(Self(value))
+    }
+  }
+}
+// endregion: -- IdentityEmail
+
 pub struct Identity {
   pub id: IdentityId,
   pub login: IdentityLogin,
+  pub email: IdentityEmail,
 }
-// endregion: -- Identity

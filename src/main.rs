@@ -2,7 +2,7 @@ mod core;
 mod input;
 mod output;
 
-use input::server::system::{self, Status};
+use input::server::{self, Status};
 use std::sync::{Arc, Mutex};
 
 #[tokio::main]
@@ -13,11 +13,14 @@ async fn main() {
 
   let config = input::config::Config::load().unwrap();
 
-  let status = Arc::new(Mutex::new(system::Status::NotReady));
-  let system_server = system::server(config.server.system, Arc::clone(&status));
-
   let mut servers = Vec::new();
+  let status = Arc::new(Mutex::new(Status::NotReady));
+
+  let system_server = server::system_server(config.server.system, Arc::clone(&status));
   servers.push(tokio::spawn(system_server));
+
+  let api_server = server::api_server(config.server.api);
+  servers.push(tokio::spawn(api_server));
 
   *status.lock().unwrap() = Status::Ready;
   for server in servers {

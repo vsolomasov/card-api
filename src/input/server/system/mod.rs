@@ -1,6 +1,8 @@
 mod error;
 mod handler;
 
+pub use error::{Error, Result};
+
 use crate::input::config::ServerConfig;
 use axum::Router;
 use std::{
@@ -8,8 +10,6 @@ use std::{
   sync::{Arc, Mutex},
 };
 use tracing::info;
-
-pub use error::{Error, Result};
 
 #[derive(Clone, Copy)]
 pub enum Status {

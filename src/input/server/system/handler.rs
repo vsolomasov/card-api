@@ -1,5 +1,3 @@
-use std::sync::{Arc, Mutex};
-
 use super::{Result, Status};
 use crate::input::server::response::EmptyResponse;
 use axum::{
@@ -9,6 +7,7 @@ use axum::{
   Json, Router,
 };
 use hyper::StatusCode;
+use std::sync::{Arc, Mutex};
 
 pub fn routes(status: Arc<Mutex<Status>>) -> Router {
   Router::new()
