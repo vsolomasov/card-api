@@ -1,17 +1,21 @@
 use std::sync::Arc;
 
-use super::Result;
-use crate::core::identity::use_case::create;
-use crate::core::{ctx::Ctx, identity::repository::Repository as IdentityRepository};
-use crate::input::server::response::ResponseWith;
-use axum::{extract::State, routing::post, Json, Router};
-use serde::{Deserialize, Serialize};
+use axum::extract::State;
+use axum::routing::post;
+use axum::Json;
+use axum::Router;
+use serde::Deserialize;
+use serde::Serialize;
 use uuid::Uuid;
 
+use super::Result;
+use crate::core::ctx::Ctx;
+use crate::core::identity::repository::Repository as IdentityRepository;
+use crate::core::identity::use_case::create;
+use crate::input::server::response::ResponseWith;
+
 pub fn routes<R>(repo: Arc<R>) -> Router
-where
-  R: IdentityRepository + Send + Sync + 'static,
-{
+where R: IdentityRepository + Send + Sync + 'static {
   Router::new()
     .route("/", post(create_handle))
     .with_state(Arc::clone(&repo))

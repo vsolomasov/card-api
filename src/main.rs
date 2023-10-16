@@ -2,9 +2,12 @@ mod core;
 mod input;
 mod output;
 
-use input::server::{self, Status};
-use output::repository::SqlRepository;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
+use std::sync::Mutex;
+
+use self::input::server;
+use self::input::server::Status;
+use self::output::repository::SqlRepository;
 
 #[tokio::main]
 async fn main() {

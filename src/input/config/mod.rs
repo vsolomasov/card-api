@@ -1,8 +1,12 @@
 mod error;
 
-pub use error::{Error, Result};
-use std::{env, str::FromStr};
+use std::env;
+use std::str::FromStr;
+
 use tracing::info;
+
+pub use self::error::Error;
+pub use self::error::Result;
 
 // region: -- Config
 #[derive(Debug)]
@@ -101,8 +105,9 @@ fn parse_env<V: FromStr>(name: &str) -> Result<V> {
 
 #[cfg(test)]
 mod test {
-  use super::*;
   use anyhow::Result;
+
+  use super::*;
 
   #[test]
   fn test_config_load_from_env_ok() -> Result<()> {

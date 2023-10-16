@@ -1,12 +1,14 @@
 mod error;
 mod identity;
 
-pub use error::{Error, Result};
-
-use crate::input::config::RepositoryConfig;
 use sqlx::postgres::PgPoolOptions;
-use sqlx::{Pool, Postgres};
+use sqlx::Pool;
+use sqlx::Postgres;
 use tracing::info;
+
+pub use self::error::Error;
+pub use self::error::Result;
+use crate::input::config::RepositoryConfig;
 
 pub type Db = Pool<Postgres>;
 
@@ -42,8 +44,9 @@ fn build_db_url(config: &RepositoryConfig) -> String {
 
 #[cfg(test)]
 mod test {
-  use super::*;
   use anyhow::Result;
+
+  use super::*;
 
   #[test]
   fn test_build_db_url_ok() -> Result<()> {

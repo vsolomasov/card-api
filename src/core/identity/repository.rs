@@ -1,6 +1,9 @@
 use async_trait::async_trait;
 
-use super::domain::{Identity, IdentityEmail, IdentityId, IdentityLogin};
+use super::domain::Identity;
+use super::domain::IdentityEmail;
+use super::domain::IdentityId;
+use super::domain::IdentityLogin;
 use super::Result;
 
 #[async_trait]

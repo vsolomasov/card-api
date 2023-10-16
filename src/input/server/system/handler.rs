@@ -1,13 +1,18 @@
-use super::{Result, Status};
-use crate::{core::ctx::Ctx, input::server::response::EmptyResponse};
-use axum::{
-  extract::State,
-  response::{IntoResponse, Response},
-  routing::get,
-  Json, Router,
-};
+use std::sync::Arc;
+use std::sync::Mutex;
+
+use axum::extract::State;
+use axum::response::IntoResponse;
+use axum::response::Response;
+use axum::routing::get;
+use axum::Json;
+use axum::Router;
 use hyper::StatusCode;
-use std::sync::{Arc, Mutex};
+
+use super::Result;
+use super::Status;
+use crate::core::ctx::Ctx;
+use crate::input::server::response::EmptyResponse;
 
 pub fn routes(status: Arc<Mutex<Status>>) -> Router {
   Router::new()

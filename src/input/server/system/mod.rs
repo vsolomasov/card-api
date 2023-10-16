@@ -1,14 +1,18 @@
 mod handler;
 
-use super::error::{Error, Result};
-use crate::input::config::ServerConfig;
-use crate::input::server::middleware::{ctx_middleware, response_middleware};
-use axum::{middleware, Router};
-use std::{
-  net::SocketAddr,
-  sync::{Arc, Mutex},
-};
+use std::net::SocketAddr;
+use std::sync::Arc;
+use std::sync::Mutex;
+
+use axum::middleware;
+use axum::Router;
 use tracing::info;
+
+use super::error::Error;
+use super::error::Result;
+use crate::input::config::ServerConfig;
+use crate::input::server::middleware::ctx_middleware;
+use crate::input::server::middleware::response_middleware;
 
 #[derive(Clone, Copy)]
 pub enum Status {
