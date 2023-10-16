@@ -3,5 +3,6 @@
 
 create table if not exists identity (
     id uuid primary key,
-    login varchar not null unique
+    login varchar not null unique,
+    email varchar not null unique
 );

@@ -1,23 +1,24 @@
-use crate::input::server::api::Error as ApiError;
-use crate::input::server::system::Error as SystemError;
+use crate::core::identity::Error as IdentityError;
+use axum::response::{IntoResponse, Response};
+use hyper::StatusCode;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
 #[derive(Debug)]
 pub enum Error {
-  System(SystemError),
-  Api(ApiError),
+  Hyper(hyper::Error),
+  Identity(IdentityError),
 }
 
-impl From<SystemError> for Error {
-  fn from(err: SystemError) -> Self {
-    Error::System(err)
+impl IntoResponse for Error {
+  fn into_response(self) -> Response {
+    StatusCode::INTERNAL_SERVER_ERROR.into_response()
   }
 }
 
-impl From<ApiError> for Error {
-  fn from(err: ApiError) -> Self {
-    Error::Api(err)
+impl From<IdentityError> for Error {
+  fn from(error: IdentityError) -> Self {
+    Self::Identity(error)
   }
 }
 

@@ -1,8 +1,9 @@
 mod error;
 mod identity;
 
+pub use error::{Error, Result};
+
 use crate::input::config::RepositoryConfig;
-use error::{Error, Result};
 use sqlx::postgres::PgPoolOptions;
 use sqlx::{Pool, Postgres};
 use tracing::info;

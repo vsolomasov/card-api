@@ -1,10 +1,14 @@
 use super::{
-  domain::{IdentityEmail, IdentityId, IdentityLogin},
+  domain::{IdentityEmail, IdentityLogin},
   repository::Repository,
   Error, Result,
 };
+use std::sync::Arc;
 
-async fn is_email_unique(repo: &dyn Repository, email: &IdentityEmail) -> Result<()> {
+pub async fn is_email_unique<R>(repo: Arc<R>, email: &IdentityEmail) -> Result<()>
+where
+  R: Repository,
+{
   let by_email_res = repo.first_by_email(&email).await;
 
   match by_email_res {
@@ -14,7 +18,10 @@ async fn is_email_unique(repo: &dyn Repository, email: &IdentityEmail) -> Result
   }
 }
 
-async fn is_login_unique(repo: &dyn Repository, login: &IdentityLogin) -> Result<()> {
+pub async fn is_login_unique<R>(repo: Arc<R>, login: &IdentityLogin) -> Result<()>
+where
+  R: Repository,
+{
   let by_login_res = repo.first_by_login(&login).await;
 
   match by_login_res {
@@ -22,14 +29,4 @@ async fn is_login_unique(repo: &dyn Repository, login: &IdentityLogin) -> Result
     Err(Error::IdentityByLoginNotFound(_)) => Ok(()),
     Err(err) => Err(err),
   }
-}
-
-pub async fn create(
-  repo: &dyn Repository,
-  email: &IdentityEmail,
-  login: &IdentityLogin,
-) -> Result<IdentityId> {
-  is_email_unique(repo, email).await?;
-  is_login_unique(repo, login).await?;
-  repo.create(login, email).await
 }

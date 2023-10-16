@@ -1,8 +1,6 @@
-mod error;
 mod handler;
 
-pub use error::{Error, Result};
-
+use super::error::{Error, Result};
 use crate::input::config::ServerConfig;
 use axum::Router;
 use std::{
