@@ -1,12 +1,10 @@
 use std::sync::Arc;
 
 use super::Result;
+use crate::core::identity::repository::Repository as IdentityRepository;
 use crate::core::identity::use_case::create;
-use crate::{
-  core::identity::repository::Repository as IdentityRepository,
-  input::server::response::ResponseWith,
-};
-use axum::{extract::State, routing::get, Json, Router};
+use crate::input::server::response::ResponseWith;
+use axum::{extract::State, routing::post, Json, Router};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -15,7 +13,7 @@ where
   R: IdentityRepository + Send + Sync + 'static,
 {
   Router::new()
-    .route("/", get(create_handle))
+    .route("/", post(create_handle))
     .with_state(Arc::clone(&repo))
 }
 
