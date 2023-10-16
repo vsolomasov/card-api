@@ -1,5 +1,6 @@
 mod api;
 mod error;
+mod middleware;
 mod response;
 mod system;
 

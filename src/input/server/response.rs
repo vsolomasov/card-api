@@ -1,5 +1,6 @@
 use serde::Serialize;
 use uuid::Uuid;
+use crate::core::ctx::Ctx;
 
 // region: -- EmptyResponse
 #[derive(Serialize)]
@@ -8,9 +9,9 @@ pub struct EmptyResponse {
 }
 
 impl EmptyResponse {
-  pub fn new() -> EmptyResponse {
+  pub fn new(ctx: &Ctx) -> EmptyResponse {
     EmptyResponse {
-      tracking_id: Uuid::new_v4(),
+      tracking_id: ctx.request_id().clone(),
     }
   }
 }
@@ -24,9 +25,9 @@ pub struct ResponseWith<P> {
 }
 
 impl<P: Serialize> ResponseWith<P> {
-  pub fn new(payload: P) -> ResponseWith<P> {
+  pub fn new(ctx: &Ctx, payload: P) -> ResponseWith<P> {
     ResponseWith {
-      tracking_id: Uuid::new_v4(),
+      tracking_id: ctx.request_id().clone(),
       payload,
     }
   }

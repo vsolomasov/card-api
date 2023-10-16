@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use super::Result;
-use crate::core::identity::repository::Repository as IdentityRepository;
 use crate::core::identity::use_case::create;
+use crate::core::{ctx::Ctx, identity::repository::Repository as IdentityRepository};
 use crate::input::server::response::ResponseWith;
 use axum::{extract::State, routing::post, Json, Router};
 use serde::{Deserialize, Serialize};
@@ -31,6 +31,7 @@ struct CreateIdentityResponse {
 
 async fn create_handle<R>(
   State(repository): State<Arc<R>>,
+  ctx: Ctx,
   Json(request_body): Json<CreateIdentityRequest>,
 ) -> Result<Json<ResponseWith<CreateIdentityResponse>>>
 where
@@ -43,9 +44,12 @@ where
   )
   .await?;
 
-  let response_body = ResponseWith::new(CreateIdentityResponse {
-    id: identity_id.raw().to_owned(),
-  });
+  let response_body = ResponseWith::new(
+    &ctx,
+    CreateIdentityResponse {
+      id: identity_id.raw().to_owned(),
+    },
+  );
   Ok(Json(response_body))
 }
 // endregion: -- CreateHandle

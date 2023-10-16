@@ -8,6 +8,7 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub enum Error {
   Hyper(hyper::Error),
   Identity(IdentityError),
+  CtxNotFound,
 }
 
 impl IntoResponse for Error {
