@@ -1,6 +1,8 @@
+use crate::core::ctx::Ctx;
 use serde::Serialize;
 use uuid::Uuid;
-use crate::core::ctx::Ctx;
+
+use super::error::ClientError;
 
 // region: -- EmptyResponse
 #[derive(Serialize)]
@@ -33,3 +35,20 @@ impl<P: Serialize> ResponseWith<P> {
   }
 }
 // endregion: -- ResponseWith
+
+// region: -- ErrorPayload
+#[derive(Serialize)]
+pub struct ErrorPayload {
+  request_id: String,
+  client_error: String,
+}
+
+impl ErrorPayload {
+  pub fn create(ctx: &Ctx, client_error: &ClientError) -> Self {
+    ErrorPayload {
+      request_id: ctx.request_id().to_string(),
+      client_error: client_error.as_ref().to_string(),
+    }
+  }
+}
+// endregion: -- ErrorPayload

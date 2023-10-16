@@ -1,11 +1,28 @@
 use super::{Error, Result};
 use crate::core::ctx::Ctx;
+use crate::input::server::response::ErrorPayload;
 use async_trait::async_trait;
 use axum::http::Request;
 use axum::middleware::Next;
-use axum::response::Response;
+use axum::response::{IntoResponse, Response};
+use axum::Json;
 use axum::{extract::FromRequestParts, http::request::Parts};
 use tracing::{debug, trace};
+
+pub async fn response_middleware<P>(ctx: Ctx, req: Request<P>, next: Next<P>) -> Result<Response> {
+  let res = next.run(req).await;
+  debug!("{} response_middleware", ctx.request_id());
+
+  let service_error = res.extensions().get::<Error>();
+  let client_status_error = service_error.map(|se| se.client_status_and_error());
+
+  let error_response = client_status_error.as_ref().map(|(status, client_error)| {
+    let body = ErrorPayload::create(&ctx, client_error);
+    (*status, Json(body)).into_response()
+  });
+
+  Ok(error_response.unwrap_or(res))
+}
 
 pub async fn ctx_middleware<P>(mut req: Request<P>, next: Next<P>) -> Result<Response> {
   debug!("init ctx for request");

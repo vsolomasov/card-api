@@ -12,7 +12,7 @@ where
   let by_email_res = repo.first_by_email(&email).await;
 
   match by_email_res {
-    Ok(_) => Err(Error::IdentityByEmailAlreadyExists(email.raw().to_owned())),
+    Ok(_) => Err(Error::EmailAlreadyExists(email.raw().to_owned())),
     Err(Error::IdentityByEmailNotFound(_)) => Ok(()),
     Err(err) => Err(err),
   }
@@ -25,7 +25,7 @@ where
   let by_login_res = repo.first_by_login(&login).await;
 
   match by_login_res {
-    Ok(_) => Err(Error::IdentityByLoginAlreadyExists(login.raw().to_owned())),
+    Ok(_) => Err(Error::LoginAlreadyExists(login.raw().to_owned())),
     Err(Error::IdentityByLoginNotFound(_)) => Ok(()),
     Err(err) => Err(err),
   }

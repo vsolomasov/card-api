@@ -6,8 +6,8 @@ pub enum Error {
   IdentityEmailIsEmpty,
   IdentityByEmailNotFound(String),
   IdentityByLoginNotFound(String),
-  IdentityByEmailAlreadyExists(String),
-  IdentityByLoginAlreadyExists(String),
+  EmailAlreadyExists(String),
+  LoginAlreadyExists(String),
   Repository(String),
 }
 

@@ -2,7 +2,7 @@ mod handler;
 
 use super::error::{Error, Result};
 use crate::input::config::ServerConfig;
-use crate::input::server::middleware::ctx_middleware;
+use crate::input::server::middleware::{ctx_middleware, response_middleware};
 use axum::{middleware, Router};
 use std::{
   net::SocketAddr,
@@ -24,6 +24,7 @@ pub async fn server(config: ServerConfig, status: Arc<Mutex<Status>>) -> Result<
 
   let routes = Router::new()
     .nest("/system", handler::routes(status))
+    .layer(middleware::from_fn(response_middleware))
     .layer(middleware::from_fn(ctx_middleware));
 
   info!(
