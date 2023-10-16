@@ -17,7 +17,6 @@ pub async fn system_server(config: ServerConfig, status: Arc<Mutex<Status>>) -> 
   Ok(system::server(config, status).await?)
 }
 
-pub async fn api_server<R>(config: ServerConfig, repo: Arc<R>) -> Result<()>
-where R: IdentityRepository + Send + Sync + 'static {
+pub async fn api_server(config: ServerConfig, repo: Arc<dyn IdentityRepository>) -> Result<()> {
   Ok(api::server(config, repo).await?)
 }

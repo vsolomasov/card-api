@@ -14,8 +14,7 @@ use crate::input::config::ServerConfig;
 use crate::input::server::middleware::ctx_middleware;
 use crate::input::server::middleware::response_middleware;
 
-pub async fn server<R>(config: ServerConfig, repo: Arc<R>) -> Result<()>
-where R: IdentityRepository + Send + Sync + 'static {
+pub async fn server(config: ServerConfig, repo: Arc<dyn IdentityRepository>) -> Result<()> {
   let raw_addr = format!("{}:{}", &config.host, &config.port);
   let addr = raw_addr
     .parse::<SocketAddr>()

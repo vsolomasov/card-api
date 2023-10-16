@@ -7,8 +7,11 @@ use crate::core::identity::domain::IdentityLogin;
 use crate::core::identity::repository::Repository as IdentityRepository;
 use crate::core::identity::service;
 
-pub async fn execute<R>(repo: Arc<R>, email: String, login: String) -> Result<IdentityId>
-where R: IdentityRepository {
+pub async fn execute(
+  repo: Arc<dyn IdentityRepository>,
+  email: String,
+  login: String,
+) -> Result<IdentityId> {
   let identity_email = IdentityEmail::try_from(email)?;
   let identity_login = IdentityLogin::try_from(login)?;
 

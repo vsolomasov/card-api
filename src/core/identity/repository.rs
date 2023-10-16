@@ -7,7 +7,7 @@ use super::domain::IdentityLogin;
 use super::Result;
 
 #[async_trait]
-pub trait Repository {
+pub trait Repository: Send + Sync {
   async fn first_by_login(&self, login: &IdentityLogin) -> Result<Identity>;
   async fn first_by_email(&self, email: &IdentityEmail) -> Result<Identity>;
   async fn create(&self, login: &IdentityLogin, email: &IdentityEmail) -> Result<IdentityId>;

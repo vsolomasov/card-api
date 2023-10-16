@@ -14,8 +14,7 @@ use crate::core::identity::repository::Repository as IdentityRepository;
 use crate::core::identity::use_case::create;
 use crate::input::server::response::ResponseWith;
 
-pub fn routes<R>(repo: Arc<R>) -> Router
-where R: IdentityRepository + Send + Sync + 'static {
+pub fn routes(repo: Arc<dyn IdentityRepository>) -> Router {
   Router::new()
     .route("/", post(create_handle))
     .with_state(Arc::clone(&repo))
@@ -33,15 +32,12 @@ struct CreateIdentityResponse {
   id: Uuid,
 }
 
-async fn create_handle<R>(
-  State(repository): State<Arc<R>>,
+async fn create_handle(
+  State(repository): State<Arc<dyn IdentityRepository>>,
   ctx: Ctx,
   Json(request_body): Json<CreateIdentityRequest>,
-) -> Result<Json<ResponseWith<CreateIdentityResponse>>>
-where
-  R: IdentityRepository,
-{
-  let identity_id = create::execute::<R>(
+) -> Result<Json<ResponseWith<CreateIdentityResponse>>> {
+  let identity_id = create::execute(
     Arc::clone(&repository),
     request_body.email,
     request_body.login,
