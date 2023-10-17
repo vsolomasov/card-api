@@ -3,6 +3,7 @@ pub type Result<T> = core::result::Result<T, Error>;
 #[derive(Debug)]
 pub enum Error {
   FailToDecodeBase64,
+  FailHmacKey,
 }
 
 impl core::fmt::Display for Error {
