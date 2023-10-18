@@ -1,17 +1,14 @@
-mod input;
-mod output;
-
 use std::sync::Arc;
 use std::sync::Mutex;
 
-use input::config::RepositoryConfig;
-use input::config::ServerConfig;
+use adapter::input::config::Config;
+use adapter::input::config::RepositoryConfig;
+use adapter::input::config::ServerConfig;
+use adapter::input::server;
+use adapter::input::server::Status;
+use adapter::output::repository::SqlRepository;
 use tokio::task::JoinHandle;
 use tracing::error;
-
-use self::input::server;
-use self::input::server::Status;
-use self::output::repository::SqlRepository;
 
 #[tokio::main]
 async fn main() {
@@ -19,7 +16,7 @@ async fn main() {
     .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
     .init();
 
-  let config = input::config::Config::load().unwrap();
+  let config = Config::load().unwrap();
   let status = Arc::new(Mutex::new(Status::NotReady));
   let system_server_jh = start_system_server(config.server.system, Arc::clone(&status)).await;
   let api_server_jh =

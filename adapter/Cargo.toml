@@ -1,0 +1,27 @@
+[package]
+name = "adapter"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# -- Module
+domain = { path = "../domain" }
+# -- Http
+axum = "0.6"
+# Serder + Json
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1"
+# -- Tracing
+tracing = "0.1"
+# -- Storage
+sqlx = { version = "0.7", features = [ "runtime-tokio", "postgres", "uuid", "time" ] }
+# -- Other
+uuid = { version = "1.4", features = ["v4", "serde"] }
+async-trait = "0.1"
+strum_macros = "0.25"
+
+[dev-dependencies]
+anyhow = "1.0"
+rand = "0.8"

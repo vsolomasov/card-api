@@ -2,12 +2,12 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 use axum::extract::State;
+use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::response::Response;
 use axum::routing::get;
 use axum::Json;
 use axum::Router;
-use hyper::StatusCode;
 
 use super::Result;
 use super::Status;

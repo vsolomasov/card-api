@@ -1,5 +1,5 @@
 [env]
-RUST_LOG = "card_api=debug"
+RUST_LOG = "adapter=debug,domain=debug,entrypoint=debug"
 
 SYSTEM_SERVER_HOST = "127.0.0.1"
 SYSTEM_SERVER_PORT = "8081"

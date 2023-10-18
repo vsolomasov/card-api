@@ -1,7 +1,7 @@
+use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::response::Response;
 use domain::identity::Error as IdentityError;
-use hyper::StatusCode;
 use tracing::debug;
 
 pub type Result<T> = core::result::Result<T, Error>;
@@ -15,9 +15,9 @@ pub enum ClientError {
 
 #[derive(Debug)]
 pub enum Error {
-  Hyper(hyper::Error),
   Identity(IdentityError),
   CtxNotFound,
+  Axum(String),
 }
 
 impl Error {
