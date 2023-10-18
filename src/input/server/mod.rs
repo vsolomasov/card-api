@@ -7,16 +7,16 @@ mod system;
 use std::sync::Arc;
 use std::sync::Mutex;
 
-pub use self::error::Error;
-pub use self::error::Result;
+use self::error::Error;
+use self::error::Result;
 pub use self::system::Status;
 use super::config::ServerConfig;
-use crate::core::identity::repository::Repository as IdentityRepository;
+use crate::output::repository::SqlRepository;
 
 pub async fn system_server(config: ServerConfig, status: Arc<Mutex<Status>>) -> Result<()> {
   Ok(system::server(config, status).await?)
 }
 
-pub async fn api_server(config: ServerConfig, repo: Arc<dyn IdentityRepository>) -> Result<()> {
-  Ok(api::server(config, repo).await?)
+pub async fn api_server(config: ServerConfig, repository: Arc<SqlRepository>) -> Result<()> {
+  Ok(api::server(config, repository).await?)
 }

@@ -9,12 +9,12 @@ use tracing::info;
 
 use super::error::Error;
 use super::error::Result;
-use crate::core::identity::repository::Repository as IdentityRepository;
 use crate::input::config::ServerConfig;
 use crate::input::server::middleware::ctx_middleware;
 use crate::input::server::middleware::response_middleware;
+use crate::output::repository::SqlRepository;
 
-pub async fn server(config: ServerConfig, repo: Arc<dyn IdentityRepository>) -> Result<()> {
+pub async fn server(config: ServerConfig, repo: Arc<SqlRepository>) -> Result<()> {
   let raw_addr = format!("{}:{}", &config.host, &config.port);
   let addr = raw_addr
     .parse::<SocketAddr>()

@@ -5,8 +5,8 @@ use std::sync::Arc;
 use axum::Router;
 
 use super::Result;
-use crate::core::identity::repository::Repository as IdentityRepository;
+use crate::output::repository::SqlRepository;
 
-pub fn routes(repo: Arc<dyn IdentityRepository>) -> Router {
+pub fn routes(repo: Arc<SqlRepository>) -> Router {
   Router::new().nest("/identity", identity::routes(repo))
 }
