@@ -1,11 +1,11 @@
 use std::sync::Arc;
 
 use super::Result;
-use crate::core::identity::domain::IdentityEmail;
-use crate::core::identity::domain::IdentityId;
-use crate::core::identity::domain::IdentityLogin;
-use crate::core::identity::repository::Repository as IdentityRepository;
-use crate::core::identity::service;
+use crate::identity::domain::IdentityEmail;
+use crate::identity::domain::IdentityId;
+use crate::identity::domain::IdentityLogin;
+use crate::identity::repository::Repository as IdentityRepository;
+use crate::identity::service;
 
 pub async fn execute(
   repo: Arc<dyn IdentityRepository>,

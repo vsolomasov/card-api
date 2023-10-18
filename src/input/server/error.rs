@@ -1,9 +1,8 @@
 use axum::response::IntoResponse;
 use axum::response::Response;
+use domain::identity::Error as IdentityError;
 use hyper::StatusCode;
 use tracing::debug;
-
-use crate::core::identity::Error as IdentityError;
 
 pub type Result<T> = core::result::Result<T, Error>;
 

@@ -1,15 +1,15 @@
 use async_trait::async_trait;
+use domain::identity::domain::Identity;
+use domain::identity::domain::IdentityEmail;
+use domain::identity::domain::IdentityId;
+use domain::identity::domain::IdentityLogin;
+use domain::identity::repository::Repository as IdentityRepository;
+use domain::identity::Error as IdentityError;
+use domain::identity::Result;
 use sqlx::FromRow;
 use uuid::Uuid;
 
 use super::SqlRepository;
-use crate::core::identity::domain::Identity;
-use crate::core::identity::domain::IdentityEmail;
-use crate::core::identity::domain::IdentityId;
-use crate::core::identity::domain::IdentityLogin;
-use crate::core::identity::repository::Repository as IdentityRepository;
-use crate::core::identity::Error as IdentityError;
-use crate::core::identity::Result;
 
 #[derive(FromRow)]
 struct IdentityEntity {

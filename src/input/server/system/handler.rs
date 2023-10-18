@@ -11,7 +11,7 @@ use hyper::StatusCode;
 
 use super::Result;
 use super::Status;
-use crate::core::ctx::Ctx;
+use crate::input::server::middleware::CtxWrapper;
 use crate::input::server::response::EmptyResponse;
 
 pub fn routes(status: Arc<Mutex<Status>>) -> Router {
@@ -21,14 +21,14 @@ pub fn routes(status: Arc<Mutex<Status>>) -> Router {
     .with_state(status)
 }
 
-async fn liveness_handler(ctx: Ctx) -> Result<Json<EmptyResponse>> {
+async fn liveness_handler(CtxWrapper(ctx): CtxWrapper) -> Result<Json<EmptyResponse>> {
   let response = EmptyResponse::new(&ctx);
   Ok(Json(response))
 }
 
 async fn readiness_handler(
   State(status_arc): State<Arc<Mutex<Status>>>,
-  ctx: Ctx,
+  CtxWrapper(ctx): CtxWrapper,
 ) -> Result<Response> {
   let status = *status_arc.lock().unwrap();
   let body = EmptyResponse::new(&ctx);

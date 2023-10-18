@@ -6,15 +6,19 @@ use axum::middleware::Next;
 use axum::response::IntoResponse;
 use axum::response::Response;
 use axum::Json;
+use domain::ctx::Ctx;
 use tracing::debug;
 use tracing::trace;
 
 use super::Error;
 use super::Result;
-use crate::core::ctx::Ctx;
 use crate::input::server::response::ErrorPayload;
 
-pub async fn response_middleware<P>(ctx: Ctx, req: Request<P>, next: Next<P>) -> Result<Response> {
+pub async fn response_middleware<P>(
+  CtxWrapper(ctx): CtxWrapper,
+  req: Request<P>,
+  next: Next<P>,
+) -> Result<Response> {
   let res = next.run(req).await;
   debug!("{} response_middleware", ctx.request_id());
 
@@ -35,8 +39,10 @@ pub async fn ctx_middleware<P>(mut req: Request<P>, next: Next<P>) -> Result<Res
   Ok(next.run(req).await)
 }
 
+pub struct CtxWrapper(pub Ctx);
+
 #[async_trait]
-impl<S: Send + Sync> FromRequestParts<S> for Ctx {
+impl<S: Send + Sync> FromRequestParts<S> for CtxWrapper {
   type Rejection = Error;
 
   async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self> {
@@ -45,6 +51,6 @@ impl<S: Send + Sync> FromRequestParts<S> for Ctx {
       .extensions
       .get::<Ctx>()
       .ok_or(Error::CtxNotFound)
-      .map(|ctx| ctx.clone())
+      .map(|ctx| CtxWrapper(ctx.clone()))
   }
 }

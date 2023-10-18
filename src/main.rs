@@ -1,4 +1,3 @@
-mod core;
 mod input;
 mod output;
 

@@ -4,7 +4,7 @@ use super::domain::IdentityEmail;
 use super::domain::IdentityLogin;
 use super::Error;
 use super::Result;
-use crate::core::identity::repository::Repository as IdentityRepository;
+use crate::identity::repository::Repository as IdentityRepository;
 
 pub async fn is_email_unique(
   repo: Arc<dyn IdentityRepository>,

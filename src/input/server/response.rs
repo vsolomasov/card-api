@@ -1,8 +1,8 @@
+use domain::ctx::Ctx;
 use serde::Serialize;
 use uuid::Uuid;
 
 use super::error::ClientError;
-use crate::core::ctx::Ctx;
 
 // region: -- EmptyResponse
 #[derive(Serialize)]

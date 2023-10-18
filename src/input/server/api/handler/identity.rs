@@ -4,14 +4,14 @@ use axum::extract::State;
 use axum::routing::post;
 use axum::Json;
 use axum::Router;
+use domain::identity::repository::Repository as IdentityRepository;
+use domain::identity::use_case::create;
 use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
 
 use super::Result;
-use crate::core::ctx::Ctx;
-use crate::core::identity::repository::Repository as IdentityRepository;
-use crate::core::identity::use_case::create;
+use crate::input::server::middleware::CtxWrapper;
 use crate::input::server::response::ResponseWith;
 
 pub fn routes(repo: Arc<dyn IdentityRepository>) -> Router {
@@ -34,7 +34,7 @@ struct CreateIdentityResponse {
 
 async fn create_handle(
   State(repository): State<Arc<dyn IdentityRepository>>,
-  ctx: Ctx,
+  CtxWrapper(ctx): CtxWrapper,
   Json(request_body): Json<CreateIdentityRequest>,
 ) -> Result<Json<ResponseWith<CreateIdentityResponse>>> {
   let identity_id = create::execute(
