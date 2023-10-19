@@ -12,9 +12,7 @@ use tracing::error;
 
 #[tokio::main]
 async fn main() {
-  tracing_subscriber::fmt()
-    .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
-    .init();
+  adapter::output::tracing::init();
 
   let config = Config::load().unwrap();
   let status = Arc::new(Mutex::new(Status::NotReady));

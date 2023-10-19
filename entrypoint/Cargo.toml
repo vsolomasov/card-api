@@ -12,7 +12,6 @@ adapter = { path = "../adapter" }
 tokio = { version = "1", features = ["full"] }
 # -- Tracing
 tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [dev-dependencies]
 httpc-test = "0.1"
