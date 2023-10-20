@@ -8,6 +8,7 @@ use axum::response::Response;
 use axum::Json;
 use domain::ctx::Ctx;
 use tracing::debug;
+use tracing::field::valuable;
 use tracing::trace;
 
 use super::Error;
@@ -20,7 +21,7 @@ pub async fn response_middleware<P>(
   next: Next<P>,
 ) -> Result<Response> {
   let res = next.run(req).await;
-  debug!("{} response_middleware", ctx.request_id());
+  debug!(ctx = valuable(&ctx), "response_middleware");
 
   let service_error = res.extensions().get::<Error>();
   let client_status_error = service_error.map(|se| se.client_status_and_error());

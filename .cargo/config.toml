@@ -1,3 +1,6 @@
+[build]
+rustflags = ["--cfg", "tracing_unstable"]
+
 [env]
 RUST_LOG = "adapter=debug,domain=debug,entrypoint=debug"
 
