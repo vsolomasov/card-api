@@ -1,7 +1,9 @@
 use async_trait::async_trait;
 use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
+use axum::http::Method;
 use axum::http::Request;
+use axum::http::Uri;
 use axum::middleware::Next;
 use axum::response::IntoResponse;
 use axum::response::Response;
@@ -9,6 +11,7 @@ use axum::Json;
 use domain::ctx::Ctx;
 use tracing::debug;
 use tracing::field::valuable;
+use tracing::info;
 use tracing::trace;
 
 use super::Error;
@@ -16,12 +19,11 @@ use super::Result;
 use crate::input::server::response::ErrorPayload;
 
 pub async fn response_middleware<P>(
-  CtxWrapper(ctx): CtxWrapper,
+  CtxWrapper(mut ctx): CtxWrapper,
   req: Request<P>,
   next: Next<P>,
 ) -> Result<Response> {
   let res = next.run(req).await;
-  debug!(ctx = valuable(&ctx), "response_middleware");
 
   let service_error = res.extensions().get::<Error>();
   let client_status_error = service_error.map(|se| se.client_status_and_error());
@@ -31,12 +33,25 @@ pub async fn response_middleware<P>(
     (*status, Json(body)).into_response()
   });
 
+  ctx.end_time();
+  info!(ctx = valuable(&ctx), "request handled");
+
   Ok(error_response.unwrap_or(res))
 }
 
-pub async fn ctx_middleware<P>(mut req: Request<P>, next: Next<P>) -> Result<Response> {
+pub async fn ctx_middleware<P>(
+  uri: Uri,
+  method: Method,
+  mut req: Request<P>,
+  next: Next<P>,
+) -> Result<Response> {
   debug!("init ctx for request");
-  req.extensions_mut().insert(Ctx::init());
+  let ctx = Ctx::init(uri.to_string(), method.to_string());
+
+  info!(ctx = valuable(&ctx), "request received");
+
+  req.extensions_mut().insert(ctx);
+
   Ok(next.run(req).await)
 }
 
