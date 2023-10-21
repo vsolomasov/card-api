@@ -33,8 +33,7 @@ pub async fn response_middleware<P>(
     (*status, Json(body)).into_response()
   });
 
-  ctx.end_time();
-  info!(ctx = valuable(&ctx), "request handled");
+  info!(ctx = valuable(&ctx.finish()), "request handled");
 
   Ok(error_response.unwrap_or(res))
 }
@@ -48,7 +47,7 @@ pub async fn ctx_middleware<P>(
   debug!("init ctx for request");
   let ctx = Ctx::init(uri.to_string(), method.to_string());
 
-  info!(ctx = valuable(&ctx), "request received");
+  info!(ctx = valuable(&ctx.log()), "request received");
 
   req.extensions_mut().insert(ctx);
 
