@@ -14,3 +14,9 @@ docker exec -it -u postgres card-api-pg psql
 # Starting CardAPI service
 cargo run
 ```
+
+## Generate secret key
+
+```bash
+echo $(xxd -g 2 -l 32 -p /dev/random | tr -d '\n')
+```

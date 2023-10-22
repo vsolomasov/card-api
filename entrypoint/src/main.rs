@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::sync::Mutex;
 
-use adapter::input::config::Config;
+use adapter::input::config;
 use adapter::input::config::RepositoryConfig;
 use adapter::input::config::ServerConfig;
 use adapter::input::server;
@@ -14,7 +14,7 @@ use tracing::error;
 async fn main() {
   adapter::output::tracing::init();
 
-  let config = Config::load().unwrap();
+  let config = config::load().unwrap();
   let status = Arc::new(Mutex::new(Status::NotReady));
   let system_server_jh = start_system_server(config.server.system, Arc::clone(&status)).await;
   let api_server_jh =
