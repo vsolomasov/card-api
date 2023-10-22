@@ -1,19 +1,18 @@
-use domain::ctx::Ctx;
 use serde::Serialize;
-use uuid::Uuid;
 
 use super::error::ClientError;
+use super::middleware::RequestId;
 
 // region: -- EmptyResponse
 #[derive(Serialize)]
 pub struct EmptyResponse {
-  pub tracking_id: Uuid,
+  request_id: RequestId,
 }
 
 impl EmptyResponse {
-  pub fn new(ctx: &Ctx) -> EmptyResponse {
+  pub fn new(request_id: &RequestId) -> EmptyResponse {
     EmptyResponse {
-      tracking_id: ctx.id().clone(),
+      request_id: request_id.clone(),
     }
   }
 }
@@ -22,14 +21,14 @@ impl EmptyResponse {
 // region: -- ResponseWith
 #[derive(Serialize)]
 pub struct ResponseWith<P> {
-  pub tracking_id: Uuid,
-  pub payload: P,
+  request_id: RequestId,
+  payload: P,
 }
 
 impl<P: Serialize> ResponseWith<P> {
-  pub fn new(ctx: &Ctx, payload: P) -> ResponseWith<P> {
+  pub fn new(request_id: &RequestId, payload: P) -> ResponseWith<P> {
     ResponseWith {
-      tracking_id: ctx.id().clone(),
+      request_id: request_id.clone(),
       payload,
     }
   }
@@ -39,14 +38,14 @@ impl<P: Serialize> ResponseWith<P> {
 // region: -- ErrorPayload
 #[derive(Serialize)]
 pub struct ErrorPayload {
-  request_id: Uuid,
+  request_id: RequestId,
   client_error: String,
 }
 
 impl ErrorPayload {
-  pub fn create(ctx: &Ctx, client_error: &ClientError) -> Self {
+  pub fn create(request_id: &RequestId, client_error: &ClientError) -> Self {
     ErrorPayload {
-      request_id: ctx.id().clone(),
+      request_id: request_id.clone(),
       client_error: client_error.as_ref().to_string(),
     }
   }

@@ -8,18 +8,35 @@ use axum::middleware::Next;
 use axum::response::IntoResponse;
 use axum::response::Response;
 use axum::Json;
-use domain::ctx::Ctx;
-use tracing::debug;
-use tracing::field::valuable;
+use serde::Serialize;
+use time::OffsetDateTime;
 use tracing::info;
-use tracing::trace;
+use tracing::span;
+use tracing::Level;
+use uuid::Uuid;
 
 use super::Error;
 use super::Result;
 use crate::input::server::response::ErrorPayload;
 
+#[derive(Serialize, Clone)]
+pub struct RequestId(Uuid);
+
+#[async_trait]
+impl<S: Send + Sync> FromRequestParts<S> for RequestId {
+  type Rejection = Error;
+
+  async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self> {
+    parts
+      .extensions
+      .get::<RequestId>()
+      .ok_or(Error::RequestId)
+      .map(|request_id| request_id.clone())
+  }
+}
+
 pub async fn response_middleware<P>(
-  CtxWrapper(mut ctx): CtxWrapper,
+  request_id: RequestId,
   req: Request<P>,
   next: Next<P>,
 ) -> Result<Response> {
@@ -29,11 +46,9 @@ pub async fn response_middleware<P>(
   let client_status_error = service_error.map(|se| se.client_status_and_error());
 
   let error_response = client_status_error.as_ref().map(|(status, client_error)| {
-    let body = ErrorPayload::create(&ctx, client_error);
+    let body = ErrorPayload::create(&request_id, client_error);
     (*status, Json(body)).into_response()
   });
-
-  info!(ctx = valuable(&ctx.finish()), "request handled");
 
   Ok(error_response.unwrap_or(res))
 }
@@ -44,28 +59,22 @@ pub async fn ctx_middleware<P>(
   mut req: Request<P>,
   next: Next<P>,
 ) -> Result<Response> {
-  debug!("init ctx for request");
-  let ctx = Ctx::init(uri.to_string(), method.to_string());
+  let start_time = OffsetDateTime::now_utc().unix_timestamp_nanos();
+  let request_id = Uuid::new_v4();
 
-  info!(ctx = valuable(&ctx.log()), "request received");
+  req.extensions_mut().insert(RequestId(request_id));
 
-  req.extensions_mut().insert(ctx);
+  let span =
+    span!(Level::INFO, "ctx_middleware", request_id = %request_id, uri = %uri, method = %method);
+  let _span = span.enter();
 
-  Ok(next.run(req).await)
-}
+  info!("request received");
+  let res = next.run(req).await;
 
-pub struct CtxWrapper(pub Ctx);
+  let end_time = OffsetDateTime::now_utc().unix_timestamp_nanos();
+  let code = res.status().as_u16();
+  let request_time = ((end_time - start_time) / 1_000_000) as i64;
+  info!(code, request_time, "request handled");
 
-#[async_trait]
-impl<S: Send + Sync> FromRequestParts<S> for CtxWrapper {
-  type Rejection = Error;
-
-  async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self> {
-    trace!("extracting ctx from request parts");
-    parts
-      .extensions
-      .get::<Ctx>()
-      .ok_or(Error::CtxNotFound)
-      .map(|ctx| CtxWrapper(ctx.clone()))
-  }
+  Ok(res)
 }

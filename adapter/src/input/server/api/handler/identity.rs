@@ -11,7 +11,7 @@ use serde::Serialize;
 use uuid::Uuid;
 
 use super::Result;
-use crate::input::server::middleware::CtxWrapper;
+use crate::input::server::middleware::RequestId;
 use crate::input::server::response::ResponseWith;
 
 pub fn routes(repo: Arc<dyn IdentityRepository>) -> Router {
@@ -34,7 +34,7 @@ struct CreateIdentityResponse {
 
 async fn create_handle(
   State(repository): State<Arc<dyn IdentityRepository>>,
-  CtxWrapper(ctx): CtxWrapper,
+  request_id: RequestId,
   Json(request_body): Json<CreateIdentityRequest>,
 ) -> Result<Json<ResponseWith<CreateIdentityResponse>>> {
   let identity_id = create::execute(
@@ -45,7 +45,7 @@ async fn create_handle(
   .await?;
 
   let response_body = ResponseWith::new(
-    &ctx,
+    &request_id,
     CreateIdentityResponse {
       id: identity_id.raw().to_owned(),
     },

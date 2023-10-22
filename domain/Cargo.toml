@@ -12,10 +12,8 @@ hmac = "0.12"
 sha2 = "0.10"
 # -- Data type
 uuid = { version = "1.4", features = ["v4"] }
-time = "0.3"
 # -- Other
 async-trait = "0.1"
-valuable = { version = "0.1.0", features = ["derive"] }
 
 [dev-dependencies]
 anyhow = "1.0"

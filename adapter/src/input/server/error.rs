@@ -16,7 +16,7 @@ pub enum ClientError {
 #[derive(Debug)]
 pub enum Error {
   Identity(IdentityError),
-  CtxNotFound,
+  RequestId,
   Axum(String),
 }
 
