@@ -2,6 +2,7 @@ use super::parse_env;
 use super::Result;
 
 // region: -- SecretConfig
+#[derive(Clone)]
 pub struct SecretConfig {
   pub password_key: String,
 }

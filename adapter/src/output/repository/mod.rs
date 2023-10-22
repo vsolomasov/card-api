@@ -13,6 +13,7 @@ use crate::input::config::RepositoryConfig;
 pub type Db = Pool<Postgres>;
 
 // region: -- SqlRepository
+#[derive(Clone)]
 pub struct SqlRepository {
   connection: Db,
 }

@@ -2,7 +2,8 @@ mod b64_url;
 mod error;
 mod hmac;
 
-use self::error::Result;
+pub use self::error::Error;
+pub use self::error::Result;
 
 pub fn sign_into_b64_url(key: &[u8], salt: &str, content: &str) -> Result<String> {
   let hmac_result = hmac::sign(key, salt, content)?;

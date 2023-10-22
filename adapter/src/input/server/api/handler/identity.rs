@@ -4,20 +4,18 @@ use axum::extract::State;
 use axum::routing::post;
 use axum::Json;
 use axum::Router;
-use domain::identity::repository::Repository as IdentityRepository;
 use domain::identity::use_case::create;
 use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
 
+use super::ApiState;
 use super::Result;
 use crate::input::server::middleware::RequestId;
 use crate::input::server::response::ResponseWith;
 
-pub fn routes(repo: Arc<dyn IdentityRepository>) -> Router {
-  Router::new()
-    .route("/", post(create_handle))
-    .with_state(Arc::clone(&repo))
+pub fn routes() -> Router<Arc<ApiState>> {
+  Router::new().route("/", post(create_handle))
 }
 
 // region: -- CreateHandle
@@ -25,6 +23,7 @@ pub fn routes(repo: Arc<dyn IdentityRepository>) -> Router {
 struct CreateIdentityRequest {
   email: String,
   login: String,
+  password: String,
 }
 
 #[derive(Serialize)]
@@ -33,21 +32,24 @@ struct CreateIdentityResponse {
 }
 
 async fn create_handle(
-  State(repository): State<Arc<dyn IdentityRepository>>,
+  State(api_state): State<Arc<ApiState>>,
   request_id: RequestId,
   Json(request_body): Json<CreateIdentityRequest>,
 ) -> Result<Json<ResponseWith<CreateIdentityResponse>>> {
+  let repository = Arc::new(api_state.repository.clone());
   let identity_id = create::execute(
-    Arc::clone(&repository),
+    repository,
+    &api_state.secret.password_key,
     request_body.email,
     request_body.login,
+    request_body.password,
   )
   .await?;
 
   let response_body = ResponseWith::new(
     &request_id,
     CreateIdentityResponse {
-      id: identity_id.raw().to_owned(),
+      id: identity_id.value().to_owned(),
     },
   );
   Ok(Json(response_body))

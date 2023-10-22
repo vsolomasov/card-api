@@ -4,9 +4,9 @@ use std::sync::Arc;
 
 use axum::Router;
 
+use super::ApiState;
 use super::Result;
-use crate::output::repository::SqlRepository;
 
-pub fn routes(repo: Arc<SqlRepository>) -> Router {
-  Router::new().nest("/identity", identity::routes(repo))
+pub fn routes() -> Router<Arc<ApiState>> {
+  Router::new().nest("/identity", identity::routes())
 }
