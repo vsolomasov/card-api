@@ -1,7 +1,7 @@
 use super::parse_env;
 use super::Result;
 
-// region: -- RepositoryConfig
+// region: RepositoryConfig
 pub struct RepositoryConfig {
   pub host: String,
   pub port: u32,
@@ -23,9 +23,9 @@ impl RepositoryConfig {
     })
   }
 }
-// endregion: RepositoryConfig
+// endregion
 
-// region: -- test
+// region: test
 #[cfg(test)]
 mod test {
   use std::env;
@@ -55,4 +55,4 @@ mod test {
     Ok(())
   }
 }
-// endregion: -- test
+// endregion

@@ -3,7 +3,7 @@ use super::Result;
 use super::SecretConfig;
 use super::ServersConfig;
 
-// region: -- AppConfig
+// region: AppConfig
 pub struct AppConfig {
   pub server: ServersConfig,
   pub repository: RepositoryConfig,
@@ -19,9 +19,9 @@ impl AppConfig {
     })
   }
 }
-// endregion: -- AppConfig
+// endregion
 
-// region: -- test
+// region: test
 #[cfg(test)]
 mod test {
   use std::env;
@@ -77,4 +77,4 @@ mod test {
     Ok(())
   }
 }
-// endregion: -- test
+// endregion

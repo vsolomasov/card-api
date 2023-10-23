@@ -17,7 +17,7 @@ pub fn routes() -> Router<Arc<ApiState>> {
   Router::new().route("/", post(create_handle))
 }
 
-// region: -- CreateHandle
+// region: CreateHandle
 #[derive(Deserialize)]
 struct CreateIdentityRequest {
   email: String,
@@ -50,4 +50,4 @@ async fn create_handle(
   let response_body = ResponseWith::new(&request_id, CreateIdentityResponse { access_token });
   Ok(Json(response_body))
 }
-// endregion: -- CreateHandle
+// endregion

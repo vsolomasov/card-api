@@ -12,7 +12,7 @@ use crate::input::config::RepositoryConfig;
 
 pub type Db = Pool<Postgres>;
 
-// region: -- SqlRepository
+// region: SqlRepository
 #[derive(Clone)]
 pub struct SqlRepository {
   connection: Db,
@@ -32,16 +32,16 @@ impl SqlRepository {
     Ok(SqlRepository { connection: pool })
   }
 }
-// endregion: -- SqlRepository
+// endregion
 
-// region: -- private func
+// region: private func
 fn build_db_url(config: &RepositoryConfig) -> String {
   format!(
     "postgres://{}:{}@{}:{}/{}",
     &config.user, &config.password, &config.host, &config.port, &config.database
   )
 }
-// endregion: -- private func
+// endregion
 
 #[cfg(test)]
 mod test {

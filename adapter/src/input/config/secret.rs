@@ -1,7 +1,7 @@
 use super::parse_env;
 use super::Result;
 
-// region: -- SecretConfig
+// region: SecretConfig
 #[derive(Clone)]
 pub struct SecretConfig {
   pub password_key: String,
@@ -18,9 +18,9 @@ impl SecretConfig {
     })
   }
 }
-// endregion: -- SecretConfig
+// endregion
 
-// region: -- test
+// region: test
 #[cfg(test)]
 mod test {
   use std::env;
@@ -56,4 +56,4 @@ mod test {
     Ok(())
   }
 }
-// endregion: -- test
+// endregion

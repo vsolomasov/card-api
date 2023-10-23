@@ -1,7 +1,7 @@
 use super::parse_env;
 use super::Result;
 
-// region: -- ServersConfig
+// region: ServersConfig
 pub struct ServersConfig {
   pub system: ServerConfig,
   pub api: ServerConfig,
@@ -15,9 +15,9 @@ impl ServersConfig {
     })
   }
 }
-// endregion: -- ServersConfig
+// endregion
 
-// region: -- ServerConfig
+// region: ServerConfig
 pub struct ServerConfig {
   pub host: String,
   pub port: u32,
@@ -35,9 +35,9 @@ impl ServerConfig {
     Ok(res)
   }
 }
-// endregion: -- ServerConfig
+// endregion
 
-// region: -- test
+// region: test
 #[cfg(test)]
 mod test {
   use std::env;
@@ -63,4 +63,4 @@ mod test {
     Ok(())
   }
 }
-// endregion: -- test
+// endregion

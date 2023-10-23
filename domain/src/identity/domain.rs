@@ -3,7 +3,7 @@ use uuid::Uuid;
 use super::Result;
 use crate::crypt::sign_into_b64_url;
 
-// region: -- IdentityId
+// region: IdentityId
 pub struct IdentityId(Uuid);
 
 impl From<Uuid> for IdentityId {
@@ -17,9 +17,9 @@ impl IdentityId {
     &self.0
   }
 }
-// endregion: -- IdentityId
+// endregion
 
-// region: -- IdentityLogin
+// region: IdentityLogin
 pub struct IdentityLogin(String);
 
 impl TryFrom<String> for IdentityLogin {
@@ -39,9 +39,9 @@ impl IdentityLogin {
     &self.0
   }
 }
-// endregion: -- IdentityLogin
+// endregion
 
-// region: -- IdentityEmail
+// region: IdentityEmail
 pub struct IdentityEmail(String);
 
 impl IdentityEmail {
@@ -61,9 +61,9 @@ impl TryFrom<String> for IdentityEmail {
     }
   }
 }
-// endregion: -- IdentityEmail
+// endregion
 
-// region: -- IdentityDecryptedPassword
+// region: IdentityDecryptedPassword
 pub struct IdentityDecryptedPassword(String);
 
 impl IdentityDecryptedPassword {
@@ -83,9 +83,9 @@ impl TryFrom<String> for IdentityDecryptedPassword {
     }
   }
 }
-// endregion: -- IdentityDecryptedPassword
+// endregion
 
-// region: -- IdentityPasswordSalt
+// region: IdentityPasswordSalt
 pub struct IdentityPasswordSalt(Uuid);
 
 impl IdentityPasswordSalt {
@@ -97,9 +97,9 @@ impl IdentityPasswordSalt {
     &self.0
   }
 }
-// endregion: -- IdentityPasswordSalt
+// endregion
 
-// region: -- IdentityEncryptedPassword
+// region: IdentityEncryptedPassword
 pub struct IdentityEncryptedPassword(String);
 
 impl IdentityEncryptedPassword {
@@ -121,7 +121,7 @@ impl IdentityEncryptedPassword {
     &self.0
   }
 }
-// endregion: -- IdentityEncryptedPassword
+// endregion
 
 pub struct IdentityForCreate<'t> {
   pub login: &'t IdentityLogin,

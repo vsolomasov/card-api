@@ -3,7 +3,7 @@ use serde::Serialize;
 use super::error::ClientError;
 use super::middleware::RequestId;
 
-// region: -- EmptyResponse
+// region: EmptyResponse
 #[derive(Serialize)]
 pub struct EmptyResponse {
   request_id: RequestId,
@@ -16,9 +16,9 @@ impl EmptyResponse {
     }
   }
 }
-// endregion: -- EmptyResponse
+// endregion
 
-// region: -- ResponseWith
+// region: ResponseWith
 #[derive(Serialize)]
 pub struct ResponseWith<P> {
   request_id: RequestId,
@@ -33,9 +33,9 @@ impl<P: Serialize> ResponseWith<P> {
     }
   }
 }
-// endregion: -- ResponseWith
+// endregion
 
-// region: -- ErrorPayload
+// region: ErrorPayload
 #[derive(Serialize)]
 pub struct ErrorPayload {
   request_id: RequestId,
@@ -50,4 +50,4 @@ impl ErrorPayload {
     }
   }
 }
-// endregion: -- ErrorPayload
+// endregion
