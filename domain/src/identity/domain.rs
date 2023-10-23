@@ -123,11 +123,11 @@ impl IdentityEncryptedPassword {
 }
 // endregion: -- IdentityEncryptedPassword
 
-pub struct IdentityForCreate {
-  pub login: IdentityLogin,
-  pub email: IdentityEmail,
-  pub salt: IdentityPasswordSalt,
-  pub password: IdentityEncryptedPassword,
+pub struct IdentityForCreate<'t> {
+  pub login: &'t IdentityLogin,
+  pub email: &'t IdentityEmail,
+  pub salt: &'t IdentityPasswordSalt,
+  pub password: &'t IdentityEncryptedPassword,
 }
 
 pub struct Identity {

@@ -41,11 +41,16 @@ mod test {
     env::set_var("REPOSITORY_USER", "user");
     env::set_var("REPOSITORY_PASSWORD", "password");
     env::set_var("REPOSITORY_DATABASE", "database");
-    env::set_var("REPOSITORY_POOL", "123");
+    env::set_var("REPOSITORY_POOL", "444");
     env::set_var(
       "SECRET_PWD_KEY",
       "e85e648bc0dece079d39bece0d1fb280635ebdc6e09668e7e55386897b6a6271",
     );
+    env::set_var(
+      "SECRET_JWT_KEY",
+      "1167efd4e93a2632cd7f054589ee37d087f7d21228b41bcee839d80146a78225",
+    );
+    env::set_var("SECRET_JWT_EXPIRATION_SEC", "555");
 
     let config = AppConfig::load_from_env()?;
 
@@ -58,11 +63,16 @@ mod test {
     assert_eq!("user", config.repository.user);
     assert_eq!("password", config.repository.password);
     assert_eq!("database", config.repository.database);
-    assert_eq!(123, config.repository.pool);
+    assert_eq!(444, config.repository.pool);
     assert_eq!(
       "e85e648bc0dece079d39bece0d1fb280635ebdc6e09668e7e55386897b6a6271",
       config.secret.password_key
     );
+    assert_eq!(
+      "1167efd4e93a2632cd7f054589ee37d087f7d21228b41bcee839d80146a78225",
+      config.secret.jwt_key
+    );
+    assert_eq!(555, config.secret.jwt_expiration_sec);
 
     Ok(())
   }

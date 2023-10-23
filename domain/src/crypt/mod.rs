@@ -1,9 +1,13 @@
 mod b64_url;
 mod error;
 mod hmac;
+mod token;
 
 pub use self::error::Error;
 pub use self::error::Result;
+pub use self::token::jwt_decode;
+pub use self::token::jwt_encode;
+pub use self::token::JwtPayload;
 
 pub fn sign_into_b64_url(key: &[u8], salt: &str, content: &str) -> Result<String> {
   let hmac_result = hmac::sign(key, salt, content)?;

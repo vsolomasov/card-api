@@ -1,7 +1,10 @@
 pub type Result<T> = core::result::Result<T, Error>;
 
 #[derive(Debug)]
+#[cfg_attr(test, derive(PartialEq))]
 pub enum Error {
+  FailToEncodeJwt(String),
+  FailToDecodeJwt(String),
   FailToDecodeBase64,
   FailHmacKey,
 }

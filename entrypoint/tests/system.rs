@@ -1,6 +1,7 @@
 const URL: &str = "http://localhost:8081";
 
 #[tokio::test]
+#[ignore]
 async fn test_system_liveness() -> httpc_test::Result<()> {
   let client = httpc_test::new_client(URL).unwrap();
 
@@ -16,6 +17,7 @@ async fn test_system_liveness() -> httpc_test::Result<()> {
 }
 
 #[tokio::test]
+#[ignore]
 async fn test_system_readiness() -> httpc_test::Result<()> {
   let client = httpc_test::new_client(URL).unwrap();
 

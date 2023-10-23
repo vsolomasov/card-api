@@ -7,7 +7,6 @@ use axum::Router;
 use domain::identity::use_case::create;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
 
 use super::ApiState;
 use super::Result;
@@ -28,7 +27,7 @@ struct CreateIdentityRequest {
 
 #[derive(Serialize)]
 struct CreateIdentityResponse {
-  id: Uuid,
+  access_token: String,
 }
 
 async fn create_handle(
@@ -37,21 +36,18 @@ async fn create_handle(
   Json(request_body): Json<CreateIdentityRequest>,
 ) -> Result<Json<ResponseWith<CreateIdentityResponse>>> {
   let repository = Arc::new(api_state.repository.clone());
-  let identity_id = create::execute(
+  let access_token = create::execute(
     repository,
     &api_state.secret.password_key,
+    &api_state.secret.jwt_key,
+    api_state.secret.jwt_expiration_sec,
     request_body.email,
     request_body.login,
     request_body.password,
   )
   .await?;
 
-  let response_body = ResponseWith::new(
-    &request_id,
-    CreateIdentityResponse {
-      id: identity_id.value().to_owned(),
-    },
-  );
+  let response_body = ResponseWith::new(&request_id, CreateIdentityResponse { access_token });
   Ok(Json(response_body))
 }
 // endregion: -- CreateHandle
