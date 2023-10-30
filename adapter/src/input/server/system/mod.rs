@@ -11,7 +11,7 @@ use tracing::info;
 use super::error::Error;
 use super::error::Result;
 use crate::input::config::ServerConfig;
-use crate::input::server::middleware::ctx_middleware;
+use crate::input::server::middleware::id_middleware;
 use crate::input::server::middleware::response_middleware;
 
 #[derive(Clone, Copy)]
@@ -29,7 +29,7 @@ pub async fn server(config: ServerConfig, status: Arc<Mutex<Status>>) -> Result<
   let routes = Router::new()
     .nest("/system", handler::routes(status))
     .layer(middleware::from_fn(response_middleware))
-    .layer(middleware::from_fn(ctx_middleware));
+    .layer(middleware::from_fn(id_middleware));
 
   info!(
     "system server is listening {}:{}",

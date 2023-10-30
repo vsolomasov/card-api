@@ -6,6 +6,8 @@ use jsonwebtoken::Header;
 use jsonwebtoken::Validation;
 use serde::Deserialize;
 use serde::Serialize;
+use time::Duration;
+use time::OffsetDateTime;
 use uuid::Uuid;
 
 use super::Error;
@@ -26,9 +28,10 @@ struct Claim {
   email: String,
 }
 
-pub fn jwt_encode(payload: JwtPayload, key: &[u8], expiration: i64) -> Result<String> {
+pub fn jwt_encode(payload: JwtPayload, key: &[u8], lifetime_sec: i64) -> Result<String> {
+  let exp = (OffsetDateTime::now_utc() + Duration::seconds(lifetime_sec)).unix_timestamp();
   let claim = Claim {
-    exp: expiration,
+    exp,
     id: payload.id,
     login: payload.login,
     email: payload.email,
@@ -38,7 +41,7 @@ pub fn jwt_encode(payload: JwtPayload, key: &[u8], expiration: i64) -> Result<St
   encode(&Header::default(), &claim, &key).map_err(|err| Error::FailToEncodeJwt(err.to_string()))
 }
 
-pub fn jwt_decode(token: &String, key: &[u8]) -> Result<JwtPayload> {
+pub fn jwt_decode(token: &str, key: &[u8]) -> Result<JwtPayload> {
   let key = DecodingKey::from_secret(key);
   decode::<Claim>(&token, &key, &Validation::default())
     .map(|token| JwtPayload {
@@ -52,23 +55,20 @@ pub fn jwt_decode(token: &String, key: &[u8]) -> Result<JwtPayload> {
 #[cfg(test)]
 mod tests {
   use anyhow::Result;
-  use time::Duration;
-  use time::OffsetDateTime;
   use uuid::Uuid;
 
   use super::*;
 
   #[test]
   fn test_crypt_token_jwt() -> Result<()> {
-    let key = "53cr3t".as_bytes();
-    let expiration = (OffsetDateTime::now_utc() + Duration::minutes(2)).unix_timestamp();
+    let key: &[u8] = "53cr3t".as_bytes();
     let payload = JwtPayload {
       id: Uuid::new_v4(),
       login: "login".to_string(),
       email: "email".to_string(),
     };
 
-    let token = jwt_encode(payload.clone(), key, expiration)?;
+    let token = jwt_encode(payload.clone(), key, 120)?;
     let claim = jwt_decode(&token, key)?;
 
     assert_eq!(claim.id, payload.id);
@@ -81,7 +81,6 @@ mod tests {
   #[test]
   fn test_crypt_token_jwt_err() -> Result<()> {
     let key = "53cr3t".as_bytes();
-    let expiration = (OffsetDateTime::now_utc() - Duration::minutes(2)).unix_timestamp();
     let payload = JwtPayload {
       id: Uuid::new_v4(),
       login: "login".to_string(),
@@ -89,7 +88,7 @@ mod tests {
     };
 
     let expected_error = Error::FailToDecodeJwt("ExpiredSignature".to_string());
-    let token = jwt_encode(payload, key, expiration)?;
+    let token = jwt_encode(payload, key, 0)?;
     let actual_error = jwt_decode(&token, key).unwrap_err();
 
     assert_eq!(actual_error, expected_error);

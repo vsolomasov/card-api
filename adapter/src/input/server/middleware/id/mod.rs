@@ -1,3 +1,5 @@
+mod error;
+
 use async_trait::async_trait;
 use axum::extract::FromRequestParts;
 use axum::http::request::Parts;
@@ -5,19 +7,15 @@ use axum::http::Method;
 use axum::http::Request;
 use axum::http::Uri;
 use axum::middleware::Next;
-use axum::response::IntoResponse;
 use axum::response::Response;
-use axum::Json;
+use error::Error;
+use error::Result;
 use serde::Serialize;
 use time::OffsetDateTime;
 use tracing::info;
 use tracing::span;
 use tracing::Level;
 use uuid::Uuid;
-
-use super::Error;
-use super::Result;
-use crate::input::server::response::ErrorPayload;
 
 #[derive(Serialize, Clone)]
 pub struct RequestId(Uuid);
@@ -30,30 +28,12 @@ impl<S: Send + Sync> FromRequestParts<S> for RequestId {
     parts
       .extensions
       .get::<RequestId>()
-      .ok_or(Error::RequestId)
+      .ok_or(Error::RequestIdNotFound)
       .map(|request_id| request_id.clone())
   }
 }
 
-pub async fn response_middleware<P>(
-  request_id: RequestId,
-  req: Request<P>,
-  next: Next<P>,
-) -> Result<Response> {
-  let res = next.run(req).await;
-
-  let service_error = res.extensions().get::<Error>();
-  let client_status_error = service_error.map(|se| se.client_status_and_error());
-
-  let error_response = client_status_error.as_ref().map(|(status, client_error)| {
-    let body = ErrorPayload::create(&request_id, client_error);
-    (*status, Json(body)).into_response()
-  });
-
-  Ok(error_response.unwrap_or(res))
-}
-
-pub async fn ctx_middleware<P>(
+pub async fn id_middleware<P>(
   uri: Uri,
   method: Method,
   mut req: Request<P>,

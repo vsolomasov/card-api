@@ -1,3 +1,4 @@
+pub mod api;
 mod system;
 
 use hyper::client::HttpConnector;

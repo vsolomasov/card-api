@@ -11,7 +11,7 @@ use super::error::Error;
 use super::error::Result;
 use crate::input::config::SecretConfig;
 use crate::input::config::ServerConfig;
-use crate::input::server::middleware::ctx_middleware;
+use crate::input::server::middleware::id_middleware;
 use crate::input::server::middleware::response_middleware;
 use crate::output::repository::SqlRepository;
 
@@ -30,12 +30,11 @@ pub async fn server(
     .parse::<SocketAddr>()
     .unwrap_or_else(|_| panic!("Error parsing addr {}", raw_addr));
 
-  let shared_state = Arc::new(ApiState { repository, secret });
+  let state = Arc::new(ApiState { repository, secret });
   let routes = Router::new()
-    .nest("/api", handler::routes())
+    .nest("/api", handler::routes(state))
     .layer(middleware::from_fn(response_middleware))
-    .layer(middleware::from_fn(ctx_middleware))
-    .with_state(shared_state);
+    .layer(middleware::from_fn(id_middleware));
 
   info!("api server is listening {}:{}", &config.host, &config.port);
 

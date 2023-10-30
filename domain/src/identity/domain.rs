@@ -4,6 +4,7 @@ use super::Result;
 use crate::crypt::sign_into_b64_url;
 
 // region: IdentityId
+#[derive(Clone)]
 pub struct IdentityId(Uuid);
 
 impl From<Uuid> for IdentityId {
@@ -20,6 +21,7 @@ impl IdentityId {
 // endregion
 
 // region: IdentityLogin
+#[derive(Clone)]
 pub struct IdentityLogin(String);
 
 impl TryFrom<String> for IdentityLogin {
@@ -42,6 +44,7 @@ impl IdentityLogin {
 // endregion
 
 // region: IdentityEmail
+#[derive(Clone)]
 pub struct IdentityEmail(String);
 
 impl IdentityEmail {
@@ -130,6 +133,7 @@ pub struct IdentityForCreate<'t> {
   pub password: &'t IdentityEncryptedPassword,
 }
 
+#[derive(Clone)]
 pub struct Identity {
   pub id: IdentityId,
   pub login: IdentityLogin,
