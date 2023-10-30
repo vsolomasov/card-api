@@ -88,7 +88,7 @@ mod tests {
     };
 
     let expected_error = Error::FailToDecodeJwt("ExpiredSignature".to_string());
-    let token = jwt_encode(payload, key, 0)?;
+    let token = jwt_encode(payload, key, -61)?;
     let actual_error = jwt_decode(&token, key).unwrap_err();
 
     assert_eq!(actual_error, expected_error);
