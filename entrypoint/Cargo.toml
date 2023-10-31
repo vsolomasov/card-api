@@ -12,3 +12,6 @@ adapter = { path = "../adapter" }
 tokio = { version = "1", features = ["full"] }
 # Tracing
 tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["json", "env-filter", "valuable"] }
+tracing-bunyan-formatter = "0.3"
+tracing-appender = "0.2"

@@ -44,17 +44,15 @@ pub async fn id_middleware<P>(
 
   req.extensions_mut().insert(RequestId(request_id));
 
-  let span =
-    span!(Level::INFO, "ctx_middleware", request_id = %request_id, uri = %uri, method = %method);
+  let span = span!(Level::INFO, "id_middleware", request_id = %request_id, request_path = %uri, request_method = %method);
   let _span = span.enter();
 
-  info!("request received");
   let res = next.run(req).await;
 
   let end_time = OffsetDateTime::now_utc().unix_timestamp_nanos();
   let code = res.status().as_u16();
-  let request_time = ((end_time - start_time) / 1_000_000) as i64;
-  info!(code, request_time, "request handled");
+  let request_time_ms = ((end_time - start_time) / 1_000_000) as i64;
+  info!(response_code = code, request_time_ms, "Request handled");
 
   Ok(res)
 }

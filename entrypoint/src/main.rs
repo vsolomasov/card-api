@@ -10,10 +10,24 @@ use adapter::input::server::Status;
 use adapter::output::repository::SqlRepository;
 use tokio::task::JoinHandle;
 use tracing::error;
+use tracing_bunyan_formatter::BunyanFormattingLayer;
+use tracing_bunyan_formatter::JsonStorageLayer;
+use tracing_subscriber::prelude::__tracing_subscriber_SubscriberExt;
+use tracing_subscriber::EnvFilter;
+use tracing_subscriber::Registry;
 
 #[tokio::main]
 async fn main() {
-  adapter::output::tracing::init();
+  let app_name = concat!("card_api-", env!("CARGO_PKG_VERSION")).to_string();
+
+  let (non_blocking_writer, _guard) = tracing_appender::non_blocking(std::io::stdout());
+  let bunyan_formatting_layer = BunyanFormattingLayer::new(app_name, non_blocking_writer);
+
+  let subscriber = Registry::default()
+    .with(EnvFilter::from_default_env())
+    .with(JsonStorageLayer)
+    .with(bunyan_formatting_layer);
+  tracing::subscriber::set_global_default(subscriber).expect("setting custom subscriber failed");
 
   let config = config::load().unwrap();
   let status = Arc::new(Mutex::new(Status::NotReady));

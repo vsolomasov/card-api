@@ -8,6 +8,7 @@ use axum::response::Response;
 use axum::routing::get;
 use axum::Json;
 use axum::Router;
+use tracing::instrument;
 
 use super::Result;
 use super::Status;
@@ -21,6 +22,7 @@ pub fn routes(status: Arc<Mutex<Status>>) -> Router {
     .with_state(status)
 }
 
+#[instrument(skip(request_id))]
 async fn liveness_handler(request_id: RequestId) -> Result<Json<EmptyResponse>> {
   let response = EmptyResponse::new(&request_id);
   Ok(Json(response))
