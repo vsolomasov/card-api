@@ -5,6 +5,8 @@ use std::sync::Arc;
 
 use axum::middleware;
 use axum::Router;
+use domain::identity::IdentitySecret;
+use domain::identity::IdentityUsecase;
 use tracing::info;
 
 use super::error::Error;
@@ -16,8 +18,7 @@ use crate::input::server::middleware::response_middleware;
 use crate::output::repository::SqlRepository;
 
 pub struct ApiState {
-  pub repository: SqlRepository,
-  pub secret: SecretConfig,
+  pub identity_usecase: IdentityUsecase,
 }
 
 pub async fn server(
@@ -30,7 +31,15 @@ pub async fn server(
     .parse::<SocketAddr>()
     .unwrap_or_else(|_| panic!("Error parsing addr {}", raw_addr));
 
-  let state = Arc::new(ApiState { repository, secret });
+  let identity_secret = IdentitySecret {
+    password_key: secret.password_key,
+    jwt_key: secret.jwt_key,
+    jwt_expiration_sec: secret.jwt_expiration_sec,
+  };
+  let identity_usecase = IdentityUsecase::create(identity_secret, Arc::new(repository));
+
+  let state = Arc::new(ApiState { identity_usecase });
+
   let routes = Router::new()
     .nest("/api", handler::routes(state))
     .layer(middleware::from_fn(response_middleware))

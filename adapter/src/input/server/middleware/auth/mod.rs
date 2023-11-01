@@ -10,7 +10,6 @@ use axum::http::Request;
 use axum::middleware::Next;
 use axum::response::Response;
 use domain::identity::domain::Identity;
-use domain::identity::use_case::authorization;
 
 use self::error::Error;
 use self::error::Result;
@@ -54,7 +53,10 @@ pub async fn auth_middleware<P>(
     .to_str()
     .map_err(|_| Error::HeaderNotStr(ACCESS_TOKEN_KEY))?;
 
-  let identity = authorization::execute(&api_state.secret.jwt_key, access_token)
+  let identity = api_state
+    .identity_usecase
+    .authorization
+    .execute(access_token)
     .await
     .map_err(|crypt_error| Error::DecodeError(crypt_error.to_string()))?;
 

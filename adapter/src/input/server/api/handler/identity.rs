@@ -6,7 +6,6 @@ use axum::routing::get;
 use axum::routing::post;
 use axum::Json;
 use axum::Router;
-use domain::identity::use_case::create;
 use serde::Deserialize;
 use serde::Serialize;
 use uuid::Uuid;
@@ -75,17 +74,15 @@ async fn create_handle(
   request_id: RequestId,
   Json(request_body): Json<CreateIdentityRequest>,
 ) -> Result<Json<ResponseWith<CreateIdentityResponse>>> {
-  let repository = Arc::new(api_state.repository.clone());
-  let access_token = create::execute(
-    repository,
-    &api_state.secret.password_key,
-    &api_state.secret.jwt_key,
-    api_state.secret.jwt_expiration_sec,
-    request_body.email,
-    request_body.login,
-    request_body.password,
-  )
-  .await?;
+  let access_token = api_state
+    .identity_usecase
+    .create
+    .execute(
+      request_body.email,
+      request_body.login,
+      request_body.password,
+    )
+    .await?;
 
   let response_body = ResponseWith::new(&request_id, CreateIdentityResponse { access_token });
   Ok(Json(response_body))
