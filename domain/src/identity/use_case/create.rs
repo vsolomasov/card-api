@@ -4,8 +4,7 @@ use async_trait::async_trait;
 
 use super::IdentitySecret;
 use super::Result;
-use crate::crypt::jwt_encode;
-use crate::crypt::JwtPayload;
+use crate::identity::domain::Identity;
 use crate::identity::domain::IdentityDecryptedPassword;
 use crate::identity::domain::IdentityEmail;
 use crate::identity::domain::IdentityEncryptedPassword;
@@ -61,17 +60,12 @@ impl IdentityCreateUsecase for IdentityCreateUsecaseImpl {
       .create(&identity_for_create)
       .await?;
 
-    let jwt_payload = JwtPayload {
-      id: identity_id.value().to_owned(),
-      login: identity_login.value().to_owned(),
-      email: identity_email.value().to_owned(),
+    let identity = Identity {
+      id: identity_id,
+      login: identity_login,
+      email: identity_email,
     };
-    let access_token = jwt_encode(
-      jwt_payload,
-      &self.identity_secret.jwt_key.as_bytes(),
-      self.identity_secret.jwt_expiration_sec,
-    )?;
 
-    Ok(access_token)
+    self.identity_service.create_token(identity)
   }
 }

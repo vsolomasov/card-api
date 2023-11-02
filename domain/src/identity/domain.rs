@@ -100,9 +100,16 @@ impl IdentityPasswordSalt {
     &self.0
   }
 }
+
+impl From<Uuid> for IdentityPasswordSalt {
+  fn from(value: Uuid) -> Self {
+    Self(value)
+  }
+}
 // endregion
 
 // region: IdentityEncryptedPassword
+#[derive(PartialEq)]
 pub struct IdentityEncryptedPassword(String);
 
 impl IdentityEncryptedPassword {
@@ -124,13 +131,20 @@ impl IdentityEncryptedPassword {
     &self.0
   }
 }
+
+impl From<String> for IdentityEncryptedPassword {
+  fn from(value: String) -> Self {
+    Self(value)
+  }
+}
 // endregion
 
-pub struct IdentityForCreate<'t> {
-  pub login: &'t IdentityLogin,
-  pub email: &'t IdentityEmail,
-  pub salt: &'t IdentityPasswordSalt,
-  pub password: &'t IdentityEncryptedPassword,
+pub struct IdentityEntity {
+  pub id: IdentityId,
+  pub login: IdentityLogin,
+  pub email: IdentityEmail,
+  pub salt: IdentityPasswordSalt,
+  pub password: IdentityEncryptedPassword,
 }
 
 #[derive(Clone)]
@@ -138,4 +152,21 @@ pub struct Identity {
   pub id: IdentityId,
   pub login: IdentityLogin,
   pub email: IdentityEmail,
+}
+
+impl From<IdentityEntity> for Identity {
+  fn from(value: IdentityEntity) -> Self {
+    Self {
+      id: value.id,
+      login: value.login,
+      email: value.email,
+    }
+  }
+}
+
+pub struct IdentityForCreate<'t> {
+  pub login: &'t IdentityLogin,
+  pub email: &'t IdentityEmail,
+  pub salt: &'t IdentityPasswordSalt,
+  pub password: &'t IdentityEncryptedPassword,
 }
