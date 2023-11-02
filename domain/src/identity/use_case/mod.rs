@@ -1,6 +1,6 @@
 mod authorization;
 mod create;
-// mod login;
+mod login;
 
 use std::sync::Arc;
 
@@ -8,9 +8,12 @@ use self::authorization::IdentityAuthorizationUsecase;
 use self::authorization::IdentityAuthorizationUsecaseImpl;
 use self::create::IdentityCreateUsecase;
 use self::create::IdentityCreateUsecaseImpl;
+use self::login::IdentityLoginUsecase;
+use self::login::IdentityLoginUsecaseImpl;
 use super::repository::IdentityRepository;
 use super::service::IdentityService;
 use super::service::IdentityServiceImpl;
+use super::Error;
 use super::Result;
 
 #[derive(Clone)]
@@ -23,7 +26,7 @@ pub struct IdentitySecret {
 pub struct IdentityUsecase {
   pub create: Box<dyn IdentityCreateUsecase>,
   pub authorization: Box<dyn IdentityAuthorizationUsecase>,
-  // pub login: Box<dyn IdentityLoginUsecase>,
+  pub login: Box<dyn IdentityLoginUsecase>,
 }
 
 impl IdentityUsecase {
@@ -48,17 +51,17 @@ impl IdentityUsecase {
         identity_secret: identity_secret.clone(),
       });
 
-    // let identity_login_usecase: Box<dyn IdentityLoginUsecase> =
-    //   Box::new(IdentityLoginUsecaseImpl {
-    //     identity_repository: Arc::clone(&identity_repository),
-    //     identity_service: Arc::clone(&identity_service),
-    //     identity_secret: identity_secret.clone(),
-    //   });
+    let identity_login_usecase: Box<dyn IdentityLoginUsecase> =
+      Box::new(IdentityLoginUsecaseImpl {
+        identity_repository: Arc::clone(&identity_repository),
+        identity_service: Arc::clone(&identity_service),
+        identity_secret: identity_secret.clone(),
+      });
 
     Self {
       create: identity_create_usecase,
       authorization: identity_authorization_usecase,
-      // login: identity_login_usecase,
+      login: identity_login_usecase,
     }
   }
 }

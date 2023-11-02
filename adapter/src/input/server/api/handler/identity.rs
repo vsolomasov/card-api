@@ -21,11 +21,40 @@ pub fn routes(state: Arc<ApiState>) -> Router {
   let auth_layer = middleware::from_fn_with_state(Arc::clone(&state), auth_middleware);
 
   Router::new()
+    .route("/login", post(login_handle))
     .route("/auth", get(auth_handle))
     .layer(auth_layer)
     .route("/", post(create_handle))
     .with_state(state)
 }
+
+// region: LoginHandle
+#[derive(Deserialize)]
+struct LoginIdentityRequest {
+  email_or_login: String,
+  password: String,
+}
+
+#[derive(Serialize)]
+struct LoginIdentityResponse {
+  access_token: String,
+}
+
+async fn login_handle(
+  State(api_state): State<Arc<ApiState>>,
+  request_id: RequestId,
+  Json(request_body): Json<LoginIdentityRequest>,
+) -> Result<Json<ResponseWith<LoginIdentityResponse>>> {
+  let access_token = api_state
+    .identity_usecase
+    .login
+    .execute(request_body.email_or_login, request_body.password)
+    .await?;
+
+  let response_body = ResponseWith::new(&request_id, LoginIdentityResponse { access_token });
+  Ok(Json(response_body))
+}
+// endregion
 
 // region: AuthHandle
 #[derive(Serialize)]
