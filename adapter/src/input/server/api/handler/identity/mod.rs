@@ -1,4 +1,4 @@
-mod auth;
+pub(super) mod auth;
 mod create;
 mod login;
 

@@ -17,7 +17,7 @@ use tracing::span;
 use tracing::Level;
 use uuid::Uuid;
 
-const REQUEST_ID_HEADER_VALUE: &str = "X-REQUEST-ID";
+pub const REQUEST_ID_HEADER_NAME: &str = "X-REQUEST-ID";
 
 #[derive(Serialize, Clone)]
 pub struct RequestId(Uuid);
@@ -57,7 +57,7 @@ pub async fn id_middleware<P>(
   info!(response_code = code, request_time_ms, "Request handled");
 
   res.headers_mut().insert(
-    REQUEST_ID_HEADER_VALUE,
+    REQUEST_ID_HEADER_NAME,
     request_id.to_string().parse().unwrap(),
   );
 

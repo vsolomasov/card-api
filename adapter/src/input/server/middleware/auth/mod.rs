@@ -15,7 +15,7 @@ use self::error::Error;
 use self::error::Result;
 use crate::input::server::api::ApiState;
 
-const ACCESS_TOKEN_KEY: &str = "X-ACCESS-TOKEN";
+const ACCESS_TOKEN_HEADER_NAME: &str = "X-ACCESS-TOKEN";
 
 #[derive(Clone)]
 pub struct Auth(Identity);
@@ -46,12 +46,12 @@ pub async fn auth_middleware<P>(
 ) -> Result<Response> {
   let raw_header = req
     .headers()
-    .get(ACCESS_TOKEN_KEY)
-    .ok_or(Error::HeaderNotFound(ACCESS_TOKEN_KEY))?;
+    .get(ACCESS_TOKEN_HEADER_NAME)
+    .ok_or(Error::HeaderNotFound(ACCESS_TOKEN_HEADER_NAME))?;
 
   let access_token = raw_header
     .to_str()
-    .map_err(|_| Error::HeaderNotStr(ACCESS_TOKEN_KEY))?;
+    .map_err(|_| Error::HeaderNotStr(ACCESS_TOKEN_HEADER_NAME))?;
 
   let identity = api_state
     .identity_usecase
