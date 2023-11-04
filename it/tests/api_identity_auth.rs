@@ -26,14 +26,13 @@ async fn test_api_identity_auth() {
     .unwrap();
 
   let auth_request = AuthRequest {
-    access_token: create_response.body.payload.access_token,
+    access_token: create_response.body.access_token,
   };
 
   let auth_response = IdentityClient::auth(&client, auth_request).await.unwrap();
 
   assert_eq!(auth_response.status, StatusCode::OK);
-  assert!(!auth_response.body.request_id.is_empty());
-  assert!(!auth_response.body.payload.id.is_empty());
-  assert_eq!(auth_response.body.payload.login, login);
-  assert_eq!(auth_response.body.payload.email, email);
+  assert!(!auth_response.body.id.is_empty());
+  assert_eq!(auth_response.body.login, login);
+  assert_eq!(auth_response.body.email, email);
 }

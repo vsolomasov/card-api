@@ -29,12 +29,24 @@ impl IdentityLoginUsecase for IdentityLoginUsecaseImpl {
   async fn execute(&self, login_or_email: String, password: String) -> Result<String> {
     let identity_by_login = move |login: String| async move {
       let login = IdentityLogin::try_from(login)?;
-      self.identity_repository.first_by_login(&login).await
+      let result = self.identity_repository.first_by_login(&login).await;
+
+      if result.is_err() {
+        tracing::info!("Identity by login {} not found", login.value());
+      }
+
+      result
     };
 
     let identity_by_email = move |email: String| async move {
       let email = IdentityEmail::try_from(email)?;
-      self.identity_repository.first_by_email(&email).await
+      let result = self.identity_repository.first_by_email(&email).await;
+
+      if result.is_err() {
+        tracing::info!("Identity by email {} not found", email.value());
+      }
+
+      result
     };
 
     let decrypted_password = IdentityDecryptedPassword::try_from(password)?;

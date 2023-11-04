@@ -4,8 +4,6 @@ use uuid::Uuid;
 
 use super::Result;
 use crate::input::server::middleware::Auth;
-use crate::input::server::middleware::RequestId;
-use crate::input::server::response::ResponseWith;
 
 #[derive(Serialize)]
 pub(super) struct AuthResponse {
@@ -25,11 +23,7 @@ impl From<Auth> for AuthResponse {
   }
 }
 
-pub(super) async fn handle(
-  request_id: RequestId,
-  auth: Auth,
-) -> Result<Json<ResponseWith<AuthResponse>>> {
-  let payload = AuthResponse::from(auth);
-  let response_body = ResponseWith::new(&request_id, payload);
+pub(super) async fn handle(auth: Auth) -> Result<Json<AuthResponse>> {
+  let response_body = AuthResponse::from(auth);
   Ok(Json(response_body))
 }

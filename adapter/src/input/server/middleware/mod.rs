@@ -15,18 +15,14 @@ use super::Error;
 use super::Result;
 use crate::input::server::response::ErrorPayload;
 
-pub async fn response_middleware<P>(
-  request_id: RequestId,
-  req: Request<P>,
-  next: Next<P>,
-) -> Result<Response> {
+pub async fn response_middleware<P>(req: Request<P>, next: Next<P>) -> Result<Response> {
   let res = next.run(req).await;
 
   let service_error = res.extensions().get::<Error>();
   let client_status_error = service_error.map(|se| se.client_status_and_error());
 
   let error_response = client_status_error.as_ref().map(|(status, client_error)| {
-    let body = ErrorPayload::create(&request_id, client_error);
+    let body = ErrorPayload::create(client_error);
     (*status, Json(body)).into_response()
   });
 

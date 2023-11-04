@@ -9,5 +9,4 @@ async fn test_system_liveness() {
   let response = SystemClient::liveness_probe(&client).await.unwrap();
 
   assert_eq!(response.status, StatusCode::OK);
-  assert!(!response.body.request_id.is_empty());
 }

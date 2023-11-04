@@ -9,5 +9,5 @@ async fn test_system_readiness() {
   let response = SystemClient::readiness_probe(&client).await.unwrap();
 
   assert_eq!(response.status, StatusCode::OK);
-  assert!(!response.body.request_id.is_empty());
+  assert_eq!(response.body.status, "Ready");
 }

@@ -6,6 +6,7 @@ use std::sync::Mutex;
 
 use axum::middleware;
 use axum::Router;
+use serde::Serialize;
 use tracing::info;
 
 use super::error::Error;
@@ -14,7 +15,7 @@ use crate::input::config::ServerConfig;
 use crate::input::server::middleware::id_middleware;
 use crate::input::server::middleware::response_middleware;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Serialize)]
 pub enum Status {
   Ready,
   NotReady,

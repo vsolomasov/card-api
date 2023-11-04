@@ -8,12 +8,11 @@ use axum::response::Response;
 use axum::routing::get;
 use axum::Json;
 use axum::Router;
+use serde::Serialize;
 use tracing::instrument;
 
 use super::Result;
 use super::Status;
-use crate::input::server::middleware::RequestId;
-use crate::input::server::response::EmptyResponse;
 
 pub fn routes(status: Arc<Mutex<Status>>) -> Router {
   Router::new()
@@ -22,18 +21,19 @@ pub fn routes(status: Arc<Mutex<Status>>) -> Router {
     .with_state(status)
 }
 
-#[instrument(skip(request_id))]
-async fn liveness_handler(request_id: RequestId) -> Result<Json<EmptyResponse>> {
-  let response = EmptyResponse::new(&request_id);
-  Ok(Json(response))
+#[instrument()]
+async fn liveness_handler() -> Result<()> {
+  Ok(())
 }
 
-async fn readiness_handler(
-  State(status_arc): State<Arc<Mutex<Status>>>,
-  request_id: RequestId,
-) -> Result<Response> {
+#[derive(Serialize)]
+pub struct ReadinessResponse {
+  pub status: Status,
+}
+
+async fn readiness_handler(State(status_arc): State<Arc<Mutex<Status>>>) -> Result<Response> {
   let status = *status_arc.lock().unwrap();
-  let body = EmptyResponse::new(&request_id);
+  let body = ReadinessResponse { status };
   let mut response = (StatusCode::SERVICE_UNAVAILABLE, Json(&body)).into_response();
 
   if let Status::Ready = status {

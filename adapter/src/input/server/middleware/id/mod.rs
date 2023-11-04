@@ -17,6 +17,8 @@ use tracing::span;
 use tracing::Level;
 use uuid::Uuid;
 
+const REQUEST_ID_HEADER_VALUE: &str = "X-REQUEST-ID";
+
 #[derive(Serialize, Clone)]
 pub struct RequestId(Uuid);
 
@@ -47,12 +49,17 @@ pub async fn id_middleware<P>(
   let span = span!(Level::INFO, "id_middleware", request_id = %request_id, request_path = %uri, request_method = %method);
   let _span = span.enter();
 
-  let res = next.run(req).await;
+  let mut res = next.run(req).await;
 
   let end_time = OffsetDateTime::now_utc().unix_timestamp_nanos();
   let code = res.status().as_u16();
   let request_time_ms = ((end_time - start_time) / 1_000_000) as i64;
   info!(response_code = code, request_time_ms, "Request handled");
+
+  res.headers_mut().insert(
+    REQUEST_ID_HEADER_VALUE,
+    request_id.to_string().parse().unwrap(),
+  );
 
   Ok(res)
 }

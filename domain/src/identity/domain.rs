@@ -21,7 +21,7 @@ impl IdentityId {
 // endregion
 
 // region: IdentityLogin
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct IdentityLogin(String);
 
 impl TryFrom<String> for IdentityLogin {
@@ -44,7 +44,7 @@ impl IdentityLogin {
 // endregion
 
 // region: IdentityEmail
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct IdentityEmail(String);
 
 impl IdentityEmail {

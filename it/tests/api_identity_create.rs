@@ -19,6 +19,5 @@ async fn test_api_identity_create() {
   let response = IdentityClient::create(&client, request_body).await.unwrap();
 
   assert_eq!(response.status, StatusCode::OK);
-  assert!(!response.body.request_id.is_empty());
-  assert!(!response.body.payload.access_token.is_empty());
+  assert!(!response.body.access_token.is_empty());
 }

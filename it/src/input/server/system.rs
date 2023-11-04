@@ -6,6 +6,7 @@ use hyper::Request;
 use serde::Deserialize;
 use serde_json::from_slice;
 
+use super::EmptyResponse;
 use super::HttpClient;
 use super::Response;
 use super::Result;
@@ -13,37 +14,28 @@ use super::Result;
 const SYSTEM_URL: &str = "http://localhost:8081";
 
 #[derive(Deserialize)]
-pub struct LivenessResponse {
-  pub request_id: String,
-}
-
-#[derive(Deserialize)]
 pub struct ReadinessResponse {
-  pub request_id: String,
+  pub status: String,
 }
 
 #[async_trait]
 pub trait SystemClient {
-  async fn liveness_probe(&self) -> Result<Response<LivenessResponse>>;
+  async fn liveness_probe(&self) -> Result<EmptyResponse>;
   async fn readiness_probe(&self) -> Result<Response<ReadinessResponse>>;
 }
 
 #[async_trait]
 impl SystemClient for HttpClient {
-  async fn liveness_probe(&self) -> Result<Response<LivenessResponse>> {
+  async fn liveness_probe(&self) -> Result<EmptyResponse> {
     let request = Request::builder()
       .method(Method::GET)
       .uri(format!("{}{}", SYSTEM_URL, "/system/liveness"))
       .body(Body::empty())?;
 
     let response = self.client.request(request).await?;
-    let status = &response.status();
-    let body_bytes = to_bytes(response.into_body()).await?;
-    let body = from_slice::<LivenessResponse>(&body_bytes)?;
-    Ok(Response {
-      status: *status,
-      body,
-    })
+    super::check_request_id(&response);
+    let status = response.status();
+    Ok(EmptyResponse { status })
   }
 
   async fn readiness_probe(&self) -> Result<Response<ReadinessResponse>> {
@@ -53,6 +45,7 @@ impl SystemClient for HttpClient {
       .body(Body::empty())?;
 
     let response = self.client.request(request).await?;
+    super::check_request_id(&response);
     let status = &response.status();
     let body_bytes = to_bytes(response.into_body()).await?;
     let body = from_slice::<ReadinessResponse>(&body_bytes)?;
