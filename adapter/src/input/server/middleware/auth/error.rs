@@ -1,16 +1,26 @@
 use axum::http::StatusCode;
-use axum::response::IntoResponse;
-use axum::response::Response;
-use tracing::debug;
 
-pub type Result<T> = core::result::Result<T, Error>;
+use crate::input::server::error::ClientError;
 
 #[derive(Debug)]
 pub enum Error {
   AuthNotFound,
-  HeaderNotFound(&'static str),
-  HeaderNotStr(&'static str),
+  BearerTokenNotFound,
   DecodeError(String),
+}
+
+impl Error {
+  pub fn client_status_and_error(&self) -> (StatusCode, ClientError) {
+    match self {
+      Self::AuthNotFound | Self::BearerTokenNotFound => {
+        (StatusCode::UNAUTHORIZED, ClientError::UNAUTHORIZED)
+      }
+      _ => (
+        StatusCode::INTERNAL_SERVER_ERROR,
+        ClientError::SERVICE_ERROR,
+      ),
+    }
+  }
 }
 
 impl core::fmt::Display for Error {
@@ -20,12 +30,3 @@ impl core::fmt::Display for Error {
 }
 
 impl std::error::Error for Error {}
-
-impl IntoResponse for Error {
-  fn into_response(self) -> Response {
-    debug!("auth error {} insert into response", self);
-    let mut placeholder = StatusCode::INTERNAL_SERVER_ERROR.into_response();
-    placeholder.extensions_mut().insert(self);
-    placeholder
-  }
-}

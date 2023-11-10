@@ -86,7 +86,7 @@ impl IdentityClient for HttpClient {
     let request = Request::builder()
       .method(Method::GET)
       .uri(format!("{}{}", API_IDENTITY_URL, "/auth"))
-      .header("X-ACCESS-TOKEN", body.access_token)
+      .header("Authorization", format!("Bearer {}", body.access_token))
       .body(Body::empty())?;
 
     let response = self.client.request(request).await?;

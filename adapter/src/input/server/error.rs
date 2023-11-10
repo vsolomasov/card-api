@@ -4,6 +4,8 @@ use axum::response::Response;
 use domain::identity::Error as IdentityError;
 use tracing::debug;
 
+use crate::input::server::middleware::auth::error::Error as AuthError;
+
 pub type Result<T> = core::result::Result<T, Error>;
 
 #[derive(strum_macros::AsRefStr)]
@@ -11,10 +13,12 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub enum ClientError {
   SERVICE_ERROR,
   CONFLICT,
+  UNAUTHORIZED,
 }
 
 #[derive(Debug)]
 pub enum Error {
+  Auth(AuthError),
   Identity(IdentityError),
   RequestId,
   Axum(String),
@@ -23,6 +27,7 @@ pub enum Error {
 impl Error {
   pub fn client_status_and_error(&self) -> (StatusCode, ClientError) {
     match self {
+      Self::Auth(auth) => auth.client_status_and_error(),
       Self::Identity(IdentityError::EmailAlreadyExists(_))
       | Self::Identity(IdentityError::LoginAlreadyExists(_)) => {
         (StatusCode::CONFLICT, ClientError::CONFLICT)
@@ -41,6 +46,12 @@ impl IntoResponse for Error {
     let mut placeholder = StatusCode::INTERNAL_SERVER_ERROR.into_response();
     placeholder.extensions_mut().insert(self);
     placeholder
+  }
+}
+
+impl From<AuthError> for Error {
+  fn from(error: AuthError) -> Self {
+    Self::Auth(error)
   }
 }
 

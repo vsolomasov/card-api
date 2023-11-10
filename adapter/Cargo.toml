@@ -9,7 +9,7 @@ edition = "2021"
 # Module
 domain = { path = "../domain" }
 # Http
-axum = "0.6"
+axum = { version = "0.6", features = ["headers"] }
 # OpenAPI
 utoipa = { version = "4", features = ["uuid"] }
 utoipa-swagger-ui = { version = "4", features = ["axum"] }

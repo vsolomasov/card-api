@@ -1,4 +1,4 @@
-mod auth;
+pub(super) mod auth;
 mod id;
 
 use axum::http::Request;
