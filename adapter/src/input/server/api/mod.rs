@@ -44,7 +44,7 @@ pub async fn server(
 
   let routes = Router::new()
     .nest("/api", handler::routes(state))
-    .merge(SwaggerUi::new("/api-docs").url("/openapi.json", handler::ApiDoc::openapi()))
+    .merge(SwaggerUi::new("/docs").url("/openapi.json", handler::ApiDoc::openapi()))
     .layer(middleware::from_fn(response_middleware))
     .layer(middleware::from_fn(id_middleware));
 

@@ -24,13 +24,15 @@ impl From<Auth> for AuthResponse {
   }
 }
 
+/// Authorization identity
 #[utoipa::path(
   get,
   path = "/api/identity/auth",
+  operation_id = "auth_identity",
   tag = "Identity endpoint",
   security(("token" = [])),
   responses(
-    (status = 200, description= "Authorization Identity", body = AuthResponse),       
+    (status = 200, description= "Authorization identity info", body = AuthResponse),       
   )
 )]
 pub(super) async fn handle(auth: Auth) -> Result<Json<AuthResponse>> {

@@ -8,9 +8,24 @@ use super::identity;
 
 #[derive(OpenApi)]
 #[openapi(
-  info(title = "CardAPI",),
-  paths(identity::auth::handle,),
-  components(schemas(identity::auth::AuthResponse)),
+  info(title = "CardAPI"),
+  servers(
+    (url = "http://localhost:8080", description = "Local server"),
+  ),
+  paths(
+    identity::auth::handle,
+    identity::create::handle,
+    identity::login::handle,
+  ),
+  components(
+    schemas(
+      identity::auth::AuthResponse,
+      identity::create::CreateIdentityRequest,
+      identity::create::CreateIdentityResponse,
+      identity::login::LoginIdentityRequest,
+      identity::login::LoginIdentityResponse,
+    )
+  ),
   modifiers(&SecurityAddon)
 )]
 pub(crate) struct ApiDoc;
