@@ -1,5 +1,5 @@
 pub(super) mod auth;
-mod id;
+pub(super) mod id;
 
 use axum::http::Request;
 use axum::middleware::Next;

@@ -5,6 +5,7 @@ use domain::identity::Error as IdentityError;
 use tracing::debug;
 
 use crate::input::server::middleware::auth::error::Error as AuthError;
+use crate::input::server::middleware::id::error::Error as IdError;
 
 pub type Result<T> = core::result::Result<T, Error>;
 
@@ -18,16 +19,17 @@ pub enum ClientError {
 
 #[derive(Debug)]
 pub enum Error {
-  Auth(AuthError),
+  IdMiddleware(IdError),
+  AuthMiddleware(AuthError),
   Identity(IdentityError),
-  RequestId,
   Axum(String),
 }
 
 impl Error {
   pub fn client_status_and_error(&self) -> (StatusCode, ClientError) {
     match self {
-      Self::Auth(auth) => auth.client_status_and_error(),
+      Self::IdMiddleware(id) => id.client_status_and_error(),
+      Self::AuthMiddleware(auth) => auth.client_status_and_error(),
       Self::Identity(IdentityError::EmailAlreadyExists(_))
       | Self::Identity(IdentityError::LoginAlreadyExists(_)) => {
         (StatusCode::CONFLICT, ClientError::CONFLICT)
@@ -40,18 +42,15 @@ impl Error {
   }
 }
 
-impl IntoResponse for Error {
-  fn into_response(self) -> Response {
-    debug!("error {} insert into response", self);
-    let mut placeholder = StatusCode::INTERNAL_SERVER_ERROR.into_response();
-    placeholder.extensions_mut().insert(self);
-    placeholder
+impl From<IdError> for Error {
+  fn from(error: IdError) -> Self {
+    Self::IdMiddleware(error)
   }
 }
 
 impl From<AuthError> for Error {
   fn from(error: AuthError) -> Self {
-    Self::Auth(error)
+    Self::AuthMiddleware(error)
   }
 }
 
@@ -68,3 +67,12 @@ impl core::fmt::Display for Error {
 }
 
 impl std::error::Error for Error {}
+
+impl IntoResponse for Error {
+  fn into_response(self) -> Response {
+    debug!("error {} insert into response", self);
+    let mut placeholder = StatusCode::INTERNAL_SERVER_ERROR.into_response();
+    placeholder.extensions_mut().insert(self);
+    placeholder
+  }
+}

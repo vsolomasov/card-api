@@ -1,4 +1,4 @@
-mod error;
+pub(crate) mod error;
 
 use async_trait::async_trait;
 use axum::extract::FromRequestParts;
@@ -9,13 +9,15 @@ use axum::http::Uri;
 use axum::middleware::Next;
 use axum::response::Response;
 use error::Error;
-use error::Result;
 use serde::Serialize;
 use time::OffsetDateTime;
 use tracing::info;
 use tracing::span;
 use tracing::Level;
 use uuid::Uuid;
+
+use crate::input::server::Error as ServerError;
+use crate::input::server::Result as ServerResult;
 
 pub const REQUEST_ID_HEADER_NAME: &str = "X-REQUEST-ID";
 
@@ -24,13 +26,13 @@ pub struct RequestId(Uuid);
 
 #[async_trait]
 impl<S: Send + Sync> FromRequestParts<S> for RequestId {
-  type Rejection = Error;
+  type Rejection = ServerError;
 
-  async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self> {
+  async fn from_request_parts(parts: &mut Parts, _state: &S) -> ServerResult<Self> {
     parts
       .extensions
       .get::<RequestId>()
-      .ok_or(Error::RequestIdNotFound)
+      .ok_or(ServerError::IdMiddleware(Error::RequestIdNotFound))
       .map(|request_id| request_id.clone())
   }
 }
@@ -40,7 +42,7 @@ pub async fn id_middleware<P>(
   method: Method,
   mut req: Request<P>,
   next: Next<P>,
-) -> Result<Response> {
+) -> ServerResult<Response> {
   let start_time = OffsetDateTime::now_utc().unix_timestamp_nanos();
   let request_id = Uuid::new_v4();
 

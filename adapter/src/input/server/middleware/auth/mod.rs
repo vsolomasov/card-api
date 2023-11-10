@@ -37,7 +37,7 @@ impl<S: Send + Sync> FromRequestParts<S> for Auth {
     parts
       .extensions
       .get::<Auth>()
-      .ok_or(ServerError::Auth(Error::AuthNotFound))
+      .ok_or(ServerError::AuthMiddleware(Error::AuthNotFound))
       .map(|auth| auth.clone())
   }
 }
